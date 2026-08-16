@@ -1,0 +1,365 @@
+@import 'tailwindcss';
+
+/* ==========================================================================
+   Xponent Global — supply-catalogue design system
+   --------------------------------------------------------------------------
+   Ported from the Uniglobal storefront's retail layout: white and smoke
+   surfaces, flat square panels on hairline borders, no rounded corners and no
+   drop shadows, with one dark steel band per page for anything that has to carry
+   weight.
+
+   Tailwind here is v4, so the palette and scale live in `@theme` as CSS custom
+   properties rather than in a `tailwind.config.js`. The generated utility names
+   are the same either way (`bg-smoke`, `border-line`, `text-ink/70`, …).
+   ========================================================================== */
+
+@theme {
+  --color-ink: #111111;
+  --color-ink-soft: #1a1a1a;
+
+  /* Xponent's brand gold (#eeb500) is brighter and greener than Uniglobal's.
+     `gold` is the accent on dark surfaces; `gold-dark` is the one for links and
+     labels on white, where the bright tone fails contrast at body sizes. */
+  --color-gold: #eeb500;
+  --color-gold-dark: #b88300;
+  --color-gold-light: #ffd45c;
+
+  /* Cool-cast machined greys, for the dark bands and the page heroes. */
+  --color-steel-950: #0a0c0d;
+  --color-steel-900: #101315;
+  --color-steel-850: #14181a;
+  --color-steel-800: #191e21;
+  --color-steel-700: #232a2e;
+  --color-steel-600: #39434a;
+  --color-steel-500: #5b676f;
+
+  --color-smoke: #f1f1f1;
+  --color-line: #dddddd;
+
+  --font-sans: 'Poppins', Helvetica, Arial, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --tracking-code: 0.24em;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* The header pins as one unit — three stacked bars, ~10rem tall — so anchor
+   targets need to clear all of it. */
+section[id],
+div[id] {
+  scroll-margin-top: 11rem;
+}
+
+/* Tailwind emits utilities inside cascade layers; unlayered CSS always wins over
+   layered CSS regardless of specificity. Without @layer base here, these rules
+   would override utility classes like `text-white` on headings. */
+@layer base {
+  body {
+    @apply bg-white text-ink antialiased;
+    font-family: var(--font-sans);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-bold;
+  }
+}
+
+.prose-body :where(p) {
+  @apply mb-4 last:mb-0;
+}
+
+/* --- Measure ------------------------------------------------------------- */
+
+/* The page measure. `-wide` is for the pinned header and full-width bands. */
+.container-retail {
+  max-width: 1440px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.container-retail-wide {
+  max-width: 1840px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 1024px) {
+  .container-retail,
+  .container-retail-wide {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+/* Narrower measure, kept for the page heroes and long-form article copy. */
+.container-page {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .container-page {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+  }
+}
+
+/* --- Long-form copy ------------------------------------------------------ */
+
+/* Long-tail copy collapsed behind a "See More" toggle — the fade tells the
+   reader there is more text without needing a hard cut. The text stays in the
+   DOM either way, so crawlers and screen readers get all of it. */
+.retail-clamp {
+  max-height: 7.5rem;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+}
+
+/* Horizontal rails: keep the native scroll but drop the scrollbar chrome, which
+   otherwise reserves a strip of dead space under every row. */
+.retail-rail {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.retail-rail::-webkit-scrollbar {
+  display: none;
+}
+
+/* --- Loading skeletons ---------------------------------------------------- */
+
+/*
+ * Placeholder blocks shown while a section's CMS records are still in flight.
+ *
+ * Every section on the home page is data-driven, so without these the page
+ * paints its static chrome and then jumps as each response lands. A skeleton
+ * holds roughly the space the real content will take, so the shift is small.
+ *
+ * The sweep is decorative: `prefers-reduced-motion` drops it to a flat tint
+ * rather than removing the placeholder, which still communicates "not yet".
+ */
+.skeleton {
+  background-color: #e8e8e8;
+  background-image: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.7) 50%, transparent 100%);
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: skeleton-sweep 1.4s ease-in-out infinite;
+}
+
+/* On the dark band the light tint above would read as content, not absence. */
+.skeleton-dark {
+  background-color: rgba(255, 255, 255, 0.12);
+  background-image: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.18) 50%, transparent 100%);
+}
+
+@keyframes skeleton-sweep {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    background-image: none;
+    animation: none;
+  }
+}
+
+/* --- Hairline grids ------------------------------------------------------ */
+
+/*
+ * Flat panels separated by hairline rules. The obvious way to draw those —
+ * `gap-px` over a container background — only works when the item count exactly
+ * fills every row: any track the grid reserves but no child occupies paints the
+ * container background as a solid grey block.
+ *
+ * Almost every grid on this site is CMS-driven (solution items, clients,
+ * affiliations, gallery plates, posts), so the count changes whenever someone
+ * edits content. Drawing the rules on the cells instead means a partially-filled
+ * last row simply ends.
+ *
+ * Cells own their right and bottom edges; the container closes the top and left.
+ * Pair with `.rule-light` or `.rule-dark` for the surface it sits on.
+ */
+.rule-grid {
+  border-top: 1px solid var(--rule);
+  border-left: 1px solid var(--rule);
+}
+
+.rule-grid > * {
+  border-right: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+
+.rule-light {
+  --rule: #dddddd;
+}
+
+.rule-dark {
+  --rule: rgba(255, 255, 255, 0.15);
+}
+
+/* --- Page heroes --------------------------------------------------------- */
+
+/*
+ * Duotone plate: desaturate the source, push gold back in as a colour layer,
+ * then scrim it toward steel. Unifies a photo set shot in wildly different light
+ * — which matters here, since every image is uploaded through the admin and
+ * nothing about the source is controlled.
+ *
+ * NOTE: `.plate` establishes its own containing block, and this file is emitted
+ * after Tailwind's utilities — so it beats `absolute`/`fixed` in the cascade.
+ * Never put a position utility on a `.plate`; wrap it in a positioned div.
+ */
+.plate {
+  position: relative;
+  overflow: hidden;
+  background-color: #0a0c0d;
+}
+
+.plate:not(.plate-hero) > img {
+  filter: grayscale(1) contrast(1.12) brightness(1.04);
+}
+
+.plate::before,
+.plate::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.plate::before {
+  background-color: #eeb500;
+  mix-blend-mode: color;
+  opacity: 0.42;
+}
+
+.plate::after {
+  background: linear-gradient(190deg, rgba(10, 12, 13, 0.12) 0%, rgba(10, 12, 13, 0.72) 100%);
+}
+
+.plate-flat::after {
+  background: rgba(10, 12, 13, 0.35);
+}
+
+/* The hero carries type across its whole width, so it needs a far lighter tint
+   and a scrim weighted to the bottom edge rather than an even wash. */
+.plate-hero > img,
+.plate-hero > video {
+  filter: none;
+}
+
+.plate-hero::before {
+  opacity: 0.24;
+}
+
+.plate-hero::after {
+  background: linear-gradient(
+    to top,
+    rgba(10, 12, 13, 0.92) 0%,
+    rgba(10, 12, 13, 0.4) 32%,
+    rgba(10, 12, 13, 0.1) 60%,
+    rgba(10, 12, 13, 0.4) 100%
+  );
+}
+
+/* Blueprint grid over the hero plates, sized to a 72px module. */
+.u-grid {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 72px 72px;
+}
+
+/* Film grain, so the large flat dark fields aren't dead. Inline SVG turbulence
+   keeps this dependency-free and cache-friendly. */
+.u-grain::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+}
+
+/* Hero display type: tight, uppercase, set heavy. */
+.display-tight {
+  letter-spacing: -0.035em;
+  line-height: 0.92;
+  text-transform: uppercase;
+  font-weight: 800;
+}
+
+/* --- Forms --------------------------------------------------------------- */
+
+/* Every field on the site (contact, newsletter, job application) is a square
+   white well on a hairline border — declared once here rather than repeated as a
+   dozen utilities per input. */
+.field {
+  width: 100%;
+  border: 1px solid var(--color-line);
+  background-color: #ffffff;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.875rem;
+  color: var(--color-ink);
+  transition: border-color 0.2s ease;
+}
+
+.field::placeholder {
+  color: rgba(17, 17, 17, 0.4);
+}
+
+.field:hover {
+  border-color: rgba(17, 17, 17, 0.4);
+}
+
+.field:focus {
+  outline: 2px solid var(--color-gold-dark);
+  outline-offset: -1px;
+  border-color: transparent;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(17, 17, 17, 0.75);
+}
+
+/* --- Motion -------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

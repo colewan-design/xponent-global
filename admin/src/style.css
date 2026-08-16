@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-gold: #eeb500;
+  --color-brand-charcoal: #1d1d1d;
+  --font-sans: 'Jost', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+  @apply bg-neutral-100 text-neutral-800 antialiased;
+}

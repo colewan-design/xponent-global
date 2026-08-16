@@ -1,0 +1,50 @@
+# Repo-wide ignores. Each app also carries its own .gitignore for framework
+# build output (backend/, frontend/, admin/); this file covers the root and
+# anything that must never leave this machine regardless of which app it sits in.
+
+# --- Credentials and access notes ----------------------------------------
+# Server access details, deploy notes, anything with a password in it.
+vps-access.md
+*credentials*
+*.pem
+*.key
+id_rsa*
+.env
+.env.*
+!.env.example
+
+# --- Personal data --------------------------------------------------------
+# The SQLite database holds users (with password hashes), newsletter
+# subscribers and job applications — real personal data, not fixtures.
+# Recreate it locally with `php artisan migrate --seed`.
+*.sqlite
+*.sqlite3
+*.db
+
+# Uploaded CVs from job applicants.
+backend/storage/app/public/resumes/
+backend/storage/app/private/
+
+# --- Dependencies and build output ---------------------------------------
+node_modules/
+vendor/
+.output/
+.nuxt/
+dist/
+
+# NOTE: frontend/public/cms/ is deliberately NOT ignored. It looks like build
+# output — sync-cms-images.mjs generates it — but its source lives under
+# backend/storage/app/public/, which Laravel's own nested .gitignore excludes
+# with a blanket `*`. Ignoring both would leave a fresh clone with no artwork at
+# all. The optimised copies are the smaller set (9 MB against 56 MB of camera
+# originals) and are what the site actually serves, so those are what we track.
+
+# --- Logs and local scratch ----------------------------------------------
+*.log
+.phpunit.result.cache
+
+# --- OS / editor ----------------------------------------------------------
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
