@@ -26,12 +26,14 @@ const nav = [
   {
     label: 'Solutions',
     href: '/solutions',
-    blurb: 'Tooling, consumables, camp facilities and construction supply.',
+    blurb: 'Tooling, consumables, steel wire, camp facilities and construction supply.',
     links: [
       { label: 'Exploration & Geotechnical', href: '/solutions#exploration-and-geotechnical' },
       { label: 'Mining & Production Consumables', href: '/solutions#mining-and-production-consumables' },
       { label: 'Construction', href: '/solutions#construction' },
       { label: 'Mining Camp Facilities', href: '/solutions#mining-camp-facilities' },
+      { label: 'Steel Wire Products', href: '/solutions#steel-wire-products' },
+      { label: 'Wire Mesh, Gabions & Fencing', href: '/solutions#wire-mesh-and-gabions' },
       { label: 'Personal Protection Equipment', href: '/solutions/personal-protection-equipment' },
       { label: 'Our Brand Partners', href: '/solutions/our-brand-partners' },
     ],

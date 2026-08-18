@@ -22,6 +22,17 @@ useSeoMeta({
 const sections = computed(() => about.value?.data?.sections ?? [])
 const [intro, vision, mission, coreValues, whereWeOperate, affiliationsIntro] = sections.value
 
+/**
+ * Only geocoded offices can be pinned. An office added through the admin without
+ * coordinates still lists in the cells below; it just does not reach the map, and
+ * if none of them are geocoded the panel falls back to the static artwork.
+ */
+const plottedLocations = computed(() =>
+  (locations.value?.data ?? []).filter(
+    (location) => Number.isFinite(location.latitude) && Number.isFinite(location.longitude),
+  ),
+)
+
 /** Core values arrive as `Term: detail` blocks separated by blank lines. */
 const values = computed(() =>
   (coreValues?.body ?? '')
@@ -94,13 +105,25 @@ const values = computed(() =>
     <section id="where-we-operate" class="container-retail pb-8 sm:pb-10" aria-label="Where we operate">
       <SectionHead :title="whereWeOperate?.heading ?? 'Where we operate'" link-label="Contact an office" link-to="/contact" />
 
-      <div v-if="whereWeOperate?.image" class="mt-6 border border-line bg-smoke p-6 sm:p-10">
-        <CmsImage
-          :src="whereWeOperate.image"
-          alt="Map of Xponent Global office and warehouse locations"
-          loading="lazy"
-          class="mx-auto w-full max-w-4xl object-contain"
-        />
+      <!-- A real map where the offices carry coordinates. ClientOnly because
+           Leaflet needs a DOM; the static artwork stands in until it mounts and
+           remains the fallback if no office has been geocoded yet. -->
+      <div v-if="plottedLocations.length || whereWeOperate?.image" class="mt-6 border border-line">
+        <ClientOnly v-if="plottedLocations.length">
+          <OfficeMap :locations="plottedLocations" />
+          <template #fallback>
+            <div class="h-80 w-full bg-smoke sm:h-105 lg:h-120" aria-hidden="true" />
+          </template>
+        </ClientOnly>
+
+        <div v-else class="bg-smoke p-6 sm:p-10">
+          <CmsImage
+            :src="whereWeOperate.image"
+            alt="Map of Xponent Global office and warehouse locations"
+            loading="lazy"
+            class="mx-auto w-full max-w-4xl object-contain"
+          />
+        </div>
       </div>
 
       <!-- Bordered cells rather than a hairline grid: the office count is

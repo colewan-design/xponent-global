@@ -11,7 +11,7 @@ const { data: solutions } = await useApiFetch('/solutions')
 useSeoMeta({
   title: 'Solutions',
   description:
-    'Exploration and geotechnical products, mining and production consumables, mining camp facilities, and construction solutions.',
+    'Exploration and geotechnical products, mining and production consumables, steel wire and mesh products, mining camp facilities, and construction solutions.',
 })
 
 const categories = computed(
@@ -38,7 +38,7 @@ function isLong(description) {
     <PageHero
       eyebrow="Solutions"
       title="Products & Solutions"
-      subtitle="Underground and surface tooling, drilling consumables, coring systems, camp facilities and construction supply — sourced, stocked and supported."
+      subtitle="Underground and surface tooling, drilling consumables, coring systems, steel wire and mesh, camp facilities and construction supply — sourced, stocked and supported."
       :image="categories[0]?.image ?? '/images/page-hero-bg.jpg'"
     />
 

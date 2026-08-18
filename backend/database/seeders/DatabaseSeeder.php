@@ -92,10 +92,10 @@ class DatabaseSeeder extends Seeder
     private function seedOfficeLocations(): void
     {
         $locations = [
-            ['label' => 'Brisbane, Australia', 'address' => '251-255 Wellington Street, Ormiston', 'city' => 'Queensland 4160', 'country' => 'Australia'],
-            ['label' => 'Philippine Warehouse', 'address' => 'Bldg. 3A Panorama Compound, Veterans Road, Veterans Center, Western Bicutan', 'city' => 'Taguig City, Metro Manila 1630', 'country' => 'Philippines'],
-            ['label' => 'Philippine Head Office', 'address' => '423 Green Meadows, Purok 11, Maa', 'city' => 'Davao City, Davao Del Sur 8000', 'country' => 'Philippines'],
-            ['label' => 'Hong Kong, China', 'address' => 'Rm 805 Harbour Crystal Centre, 100 Granville Road, Tsim Sha Tsui', 'city' => 'Kowloon', 'country' => 'Hong Kong'],
+            ['label' => 'Brisbane, Australia', 'address' => '251-255 Wellington Street, Ormiston', 'city' => 'Queensland 4160', 'latitude' => -27.4984053, 'longitude' => 153.2575597, 'country' => 'Australia'],
+            ['label' => 'Philippine Warehouse', 'address' => 'Bldg. 3A Panorama Compound, Veterans Road, Veterans Center, Western Bicutan', 'city' => 'Taguig City, Metro Manila 1630', 'latitude' => 14.5095273, 'longitude' => 121.0380244, 'country' => 'Philippines'],
+            ['label' => 'Philippine Head Office', 'address' => '423 Green Meadows, Purok 11, Maa', 'city' => 'Davao City, Davao Del Sur 8000', 'latitude' => 7.0899788, 'longitude' => 125.5781439, 'country' => 'Philippines'],
+            ['label' => 'Hong Kong, China', 'address' => 'Rm 805 Harbour Crystal Centre, 100 Granville Road, Tsim Sha Tsui', 'city' => 'Kowloon', 'latitude' => 22.3008651, 'longitude' => 114.1783375, 'country' => 'Hong Kong'],
         ];
 
         foreach ($locations as $index => $location) {
@@ -351,8 +351,8 @@ class DatabaseSeeder extends Seeder
             ['title' => 'Reverse-Circulation System', 'description' => 'RC drilling equipment delivering fast, contamination-free sample recovery for exploration programs.', 'image' => 'seed/sol-image-02.png'],
             ['title' => 'Core Saw, Blades and Accessories', 'description' => 'Precision core saws and diamond blades for clean, accurate core sample cutting.', 'image' => 'seed/sol-image-07.png'],
             ['title' => 'Discoverer Core Trays', 'description' => "Proven in the field since 1993 and used by many of the world's leading mining companies. Designed and engineered for ease of use, safety in the field and to withstand the harshest climates, from sub-zero conditions to extreme heat. Manufactured to exacting standards to give you the ultimate in core storage.\n\nFeatures:\nErgonomic built-in handles\nBold START indicator\nNesting capabilities\nStacking capabilities\nFull depth channel heights\nRibbing for stability in transportation\nIntegral strength and high durability\nDrainage holes that prevent water-logging\n\nDiscoverer Accessories:\nCore markers\nLids and lid clips\nLocking links\nAluminium ID tags", 'image' => 'seed/sol-image-08.png'],
-            ['title' => 'Core Orientation Solutions and Survey Cameras', 'description' => 'Orientation tools and downhole survey cameras for accurate structural analysis of recovered core.', 'image' => 'seed/gallery-img-09.jpg'],
-            ['title' => 'Drilling Fluids and Additives', 'description' => 'A range of drilling fluids and additives formulated to improve hole stability and drilling performance.', 'image' => 'seed/gallery-img-10.jpg'],
+            ['title' => 'Core Orientation Solutions and Survey Cameras', 'description' => 'Orientation tools and downhole survey cameras for accurate structural analysis of recovered core.', 'image' => null],
+            ['title' => 'Drilling Fluids and Additives', 'description' => 'A range of drilling fluids and additives formulated to improve hole stability and drilling performance.', 'image' => null],
         ];
         $this->createSolutionItems($exploration, $explorationItems);
 
@@ -360,18 +360,18 @@ class DatabaseSeeder extends Seeder
             'title' => 'Mining and Production Consumables',
             'slug' => 'mining-and-production-consumables',
             'description' => 'Rock support, rail infrastructure, and production consumables that keep underground and surface mining operations running.',
-            'image' => 'seed/gallery-img-13.jpg',
+            'image' => 'seed/sol-image-06.png',
             'sort_order' => 2,
         ]);
 
         $miningItems = [
-            ['title' => 'Rock Bolts, Plates and Accessories', 'description' => 'A full range of rock bolts, plates, and accessories for reliable ground support.', 'image' => 'seed/gallery-img-14.jpg'],
-            ['title' => 'Grinding Balls and Rods', 'description' => 'High-chrome grinding media engineered for consistent performance and low wear rates in mineral processing.', 'image' => 'seed/gallery-img-15.jpg'],
-            ['title' => 'Mine Rails, Mine Cars and Consumables', 'description' => 'Steel rails, mine cars, and associated consumables for underground haulage systems.', 'image' => 'seed/gallery-img-16.jpg'],
-            ['title' => 'Mining Equipment', 'description' => 'Supporting equipment for day-to-day mining operations, sourced from trusted global manufacturers.', 'image' => 'seed/gallery-img-01.jpg'],
-            ['title' => 'Steel Mesh', 'description' => 'Welded steel mesh for ground support and reinforcement applications.', 'image' => 'seed/gallery-img-02.jpg'],
-            ['title' => 'Mobile Crimping Workshop', 'description' => 'On-site mobile crimping services to minimize downtime on cable and rope maintenance.', 'image' => 'seed/gallery-img-03.jpg'],
-            ['title' => 'Production Drilling', 'description' => 'Tooling and consumables purpose-built for high-volume production drilling.', 'image' => 'seed/gallery-img-04.jpg'],
+            ['title' => 'Rock Bolts, Plates and Accessories', 'description' => 'A full range of rock bolts, plates, and accessories for reliable ground support.', 'image' => null],
+            ['title' => 'Grinding Balls and Rods', 'description' => 'High-chrome grinding media engineered for consistent performance and low wear rates in mineral processing.', 'image' => null],
+            ['title' => 'Mine Rails, Mine Cars and Consumables', 'description' => 'Steel rails, mine cars, and associated consumables for underground haulage systems.', 'image' => null],
+            ['title' => 'Mining Equipment', 'description' => 'Supporting equipment for day-to-day mining operations, sourced from trusted global manufacturers.', 'image' => null],
+            ['title' => 'Steel Mesh', 'description' => 'Welded steel mesh for ground support and reinforcement applications.', 'image' => null],
+            ['title' => 'Mobile Crimping Workshop', 'description' => 'On-site mobile crimping services to minimize downtime on cable and rope maintenance.', 'image' => null],
+            ['title' => 'Production Drilling', 'description' => 'Tooling and consumables purpose-built for high-volume production drilling.', 'image' => null],
         ];
         $this->createSolutionItems($mining, $miningItems);
 
@@ -386,7 +386,7 @@ class DatabaseSeeder extends Seeder
         // Legacy page order: the quality-standard block sits directly under the CIMC
         // intro, ahead of the three accommodation units.
         $campItems = [
-            ['title' => 'Global Quality Standard', 'description' => "The assessment of buildings has been conducted in accordance with the following Australian Standards:\n\nAS/NZS 1170.0:2002 — Structural Design Actions\nAS/NZS 1170.1:2002 — Permanent, Imposed, and Other Actions\nAS/NZS 1170.2:2011 — Wind Load Actions\nAS 1170.4:2007 — Earthquake Load Actions\nAS 4100-1998 — Steel Structures\nAS/NZS 4600:2005 — Cold-Formed Steel Structures", 'image' => 'seed/gallery-img-05.jpg'],
+            ['title' => 'Global Quality Standard', 'description' => "The assessment of buildings has been conducted in accordance with the following Australian Standards:\n\nAS/NZS 1170.0:2002 — Structural Design Actions\nAS/NZS 1170.1:2002 — Permanent, Imposed, and Other Actions\nAS/NZS 1170.2:2011 — Wind Load Actions\nAS 1170.4:2007 — Earthquake Load Actions\nAS 4100-1998 — Steel Structures\nAS/NZS 4600:2005 — Cold-Formed Steel Structures", 'image' => null],
             ['title' => 'CIMC Modular 4-Bedroom Relocatable Accommodation — Upper Level', 'description' => "Brand new. Steel chassis, sandwich panel construction with galvanised external cladding. Building dimensions 15.15m x 4.45m including services frame (contains HWS, air-con, switch gear). Meets AS1170.2-2002 for wind region A1, terrain category 2.\n\nSpecification:\nDaikin Inverter air-conditioning (indoor unit FTXS25KVMA, heat pump outdoor unit RXS25KVMA)\nHot water service — Rheem MPI-325 electric, 325L, integrated heat pump (model 55132505)\nFridge — Haier 130L (model HBF130W)\nEnsuite comprising tiled floor, imperial ware ceramic 4-star water rating dual flush toilet, 2-door lockable ceramic vanity, and glass shower door\nRooms wired for voice & data\n4 x 10-amp double power outlets\n1 x 10-amp single power outlet\nHard-wired smoke detector\n\nEach bedroom also features:\n26\" LCD TV with wall bracket\nSealy king single ensemble bed & mattress\nBlock-out blinds\nCordless kettle\nBedside 3-drawer mobile unit\nFixed shelf unit\n2-door lockable storage cupboard\nDesk\nBlack mesh chair", 'image' => 'seed/solution-1.png'],
             ['title' => 'CIMC Modular 4-Bedroom Relocatable Accommodation — Lower Level', 'description' => "Brand new. Steel chassis, sandwich panel construction with galvanised external cladding. Building dimensions 15.15m x 4.45m including services frame (contains HWS, air-con, switch gear). Meets AS1170.2-2002 for wind region A1, terrain category 2.\n\nSpecification:\nDaikin Inverter air-conditioning (indoor unit FTXS25KVMA, outdoor unit RXS25KVMA)\nHot water service — Rheem MPI-325 electric, 325L, integrated heat pump (model 55132505)\nFridge — Haier 130L (model HBF130W)\nEnsuite comprising tiled floor, imperial ware ceramic 4-star water rating dual flush toilet, 2-door lockable ceramic vanity, and glass shower door\nRooms wired for voice & data\n4 x 10-amp double power outlets\n1 x 10-amp single power outlet\nHard-wired smoke detector\n\nEach bedroom includes:\n26\" LCD TV with wall bracket\nSealy king single ensemble bed & mattress\nBlock-out blinds\nCordless kettle\nBedside 3-drawer mobile unit\nFixed shelf unit\n2-door lockable storage cupboard\nDesk\nBlack mesh chair", 'image' => 'seed/solution-lower.png'],
             ['title' => 'CIMC Modular 4-Bedroom Relocatable Accommodation — Building', 'description' => "Two-storey relocatable accommodation complexes, available in three sizes: 44, 47 or 60 rooms.\n\n44 Room Two-Storey Complex:\n6 x CIMC Modular 4-Bedroom Relocatable Accommodation Buildings — Upper Level\n5 x CIMC Modular 4-Bedroom Relocatable Accommodation Buildings — Lower Level\n1 x CIMC Modular Relocatable Laundry Services Building — Lower Level\nFabricated Steel Balcony & Stair Structure\n\n47 Room Two-Storey Complex:\n6 x CIMC Modular 4-Bedroom Relocatable Accommodation Buildings — Upper Level\n5 x CIMC Modular 4-Bedroom Relocatable Accommodation Buildings — Lower Level\n1 x CIMC Modular 3-Bedroom & Communications Relocatable Accommodation — Lower Level\nFabricated Steel Balcony & Stair Structure\n\n60 Room Two-Storey Complex:\n8 x CIMC Modular 4-Bedroom Relocatable Accommodation Buildings — Upper Level\n6 x CIMC Modular 4-Bedroom Relocatable Accommodation Buildings — Lower Level\n1 x CIMC Modular Relocatable Laundry Services Building — Lower Level\n1 x CIMC Modular 3-Bedroom & Communications Relocatable Accommodation — Lower Level\n1 x CIMC Modular Relocatable Disabled Laundry Services Building — Lower Level\nFabricated Steel Balcony & Stair Structure", 'image' => 'seed/solution-2.png'],
@@ -397,22 +397,25 @@ class DatabaseSeeder extends Seeder
             'title' => 'Construction',
             'slug' => 'construction',
             'description' => 'Materials, equipment, and modular building solutions supporting construction programs across mining, energy, and infrastructure projects.',
-            'image' => 'seed/gallery-img-06.jpg',
+            'image' => 'seed/solution-2.png',
             'sort_order' => 4,
         ]);
 
         $constructionItems = [
-            ['title' => 'Construction Materials & Equipment', 'description' => 'Sourcing and supply of construction materials and equipment for infrastructure and site development projects.', 'image' => 'seed/gallery-img-07.jpg'],
-            ['title' => 'Modular & Relocatable Buildings', 'description' => 'Relocatable building solutions delivered through our partnership with CIMC, suited to remote and fast-track construction sites.', 'image' => 'seed/gallery-img-08.jpg'],
+            ['title' => 'Construction Materials & Equipment', 'description' => 'Sourcing and supply of construction materials and equipment for infrastructure and site development projects.', 'image' => null],
+            ['title' => 'Modular & Relocatable Buildings', 'description' => 'Relocatable building solutions delivered through our partnership with CIMC, suited to remote and fast-track construction sites.', 'image' => null],
         ];
         $this->createSolutionItems($construction, $constructionItems);
+
+        // Chin Herr wire and mesh ranges sit at sort_order 5 and 6, ahead of PPE.
+        $this->call(ChinHerrWireSolutionsSeeder::class);
 
         $ppe = SolutionCategory::create([
             'title' => 'Personal Protection Equipment',
             'slug' => 'personal-protection-equipment',
             'description' => 'PPE ranges supplied to keep crews safe across mining, drilling, and construction sites — including Wayne Gumboots.',
             'image' => 'seed/personal-1.png',
-            'sort_order' => 5,
+            'sort_order' => 7,
         ]);
 
         $ppeItems = [

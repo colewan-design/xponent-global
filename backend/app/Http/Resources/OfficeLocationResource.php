@@ -15,6 +15,8 @@ class OfficeLocationResource extends JsonResource
             'address' => $this->address,
             'city' => $this->city,
             'country' => $this->country,
+            'latitude' => $this->latitude,
+            'longitude' => $this->longitude,
             'sort_order' => $this->sort_order,
         ];
     }

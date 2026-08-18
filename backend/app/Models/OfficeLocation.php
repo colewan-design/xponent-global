@@ -11,6 +11,17 @@ class OfficeLocation extends Model
         'address',
         'city',
         'country',
+        'latitude',
+        'longitude',
         'sort_order',
     ];
+
+    /** Cast off the decimal columns' string representation so the API emits numbers. */
+    protected function casts(): array
+    {
+        return [
+            'latitude' => 'float',
+            'longitude' => 'float',
+        ];
+    }
 }
