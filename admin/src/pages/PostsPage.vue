@@ -91,6 +91,7 @@ async function removePost(id) {
 </script>
 
 <template>
+  <div class="page-frame">
   <PageHeader title="Posts & Case Studies" description="News & Insights and Case Studies shown across the site.">
     <template #actions>
       <SearchInput v-model="search" placeholder="Search posts…" />
@@ -98,28 +99,28 @@ async function removePost(id) {
     </template>
   </PageHeader>
 
-  <div class="overflow-hidden rounded-xl border border-neutral-200 bg-white">
-    <table class="w-full text-sm">
-      <thead class="bg-neutral-50 text-left text-xs uppercase tracking-wide text-neutral-500">
+  <div class="ui-table-wrap ui-table-scroll">
+    <table class="ui-table">
+      <thead>
         <tr>
-          <th class="px-4 py-3">Title</th>
-          <th class="px-4 py-3">Type</th>
-          <th class="px-4 py-3">Published</th>
-          <th class="px-4 py-3"></th>
+          <th>Title</th>
+          <th>Type</th>
+          <th>Published</th>
+          <th></th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-neutral-100">
-        <tr v-for="post in items" :key="post.id" class="hover:bg-neutral-50">
-          <td class="px-4 py-3 font-medium text-neutral-900">{{ post.title }}</td>
-          <td class="px-4 py-3 capitalize">{{ post.type.replace('_', ' ') }}</td>
-          <td class="px-4 py-3">{{ post.published ? 'Yes' : 'No' }}</td>
-          <td class="px-4 py-3 text-right">
-            <button class="text-brand-charcoal underline mr-3" @click="openEdit(post)">Edit</button>
-            <button class="text-red-600 underline" @click="removePost(post.id)">Delete</button>
+      <tbody>
+        <tr v-for="post in items" :key="post.id">
+          <td class="cell-strong">{{ post.title }}</td>
+          <td class="capitalize">{{ post.type.replace('_', ' ') }}</td>
+          <td>{{ post.published ? 'Yes' : 'No' }}</td>
+          <td class="cell-actions">
+            <button class="ui-link-btn" @click="openEdit(post)">Edit</button>
+            <button class="ui-link-btn ui-link-btn--danger" @click="removePost(post.id)">Delete</button>
           </td>
         </tr>
         <tr v-if="!loading && items.length === 0">
-          <td colspan="4" class="px-4 py-8 text-center text-neutral-400">No posts found.</td>
+          <td colspan="4" class="ui-table-empty">No posts found.</td>
         </tr>
       </tbody>
     </table>
@@ -149,7 +150,7 @@ async function removePost(id) {
       <FormField label="Cover image">
         <FileInput @change="(file) => (coverImageFile = file)" />
       </FormField>
-      <label class="flex items-center gap-2 mb-4 text-sm text-neutral-700">
+      <label class="flex items-center gap-2 mb-4 text-sm ui-text">
         <input v-model="form.published" type="checkbox" class="rounded border-neutral-300" />
         Published
       </label>
@@ -159,4 +160,5 @@ async function removePost(id) {
       </div>
     </form>
   </Modal>
+  </div>
 </template>

@@ -12,21 +12,19 @@ function goTo(page) {
 </script>
 
 <template>
-  <div v-if="meta && meta.last_page > 1" class="mt-4 flex items-center justify-between text-sm text-neutral-500">
-    <p>
-      Showing {{ meta.from }}–{{ meta.to }} of {{ meta.total }}
-    </p>
-    <div class="flex items-center gap-2">
+  <div v-if="meta && meta.last_page > 1" class="ui-pagination">
+    <p>Showing {{ meta.from }}–{{ meta.to }} of {{ meta.total }}</p>
+    <div class="ui-pagination-controls">
       <button
-        class="rounded-md border border-neutral-300 px-3 py-1.5 disabled:opacity-40"
+        class="ui-btn ui-btn--secondary"
         :disabled="meta.current_page === 1"
         @click="goTo(meta.current_page - 1)"
       >
         Previous
       </button>
-      <span class="px-2">Page {{ meta.current_page }} of {{ meta.last_page }}</span>
+      <span style="padding: 0 4px">Page {{ meta.current_page }} of {{ meta.last_page }}</span>
       <button
-        class="rounded-md border border-neutral-300 px-3 py-1.5 disabled:opacity-40"
+        class="ui-btn ui-btn--secondary"
         :disabled="meta.current_page === meta.last_page"
         @click="goTo(meta.current_page + 1)"
       >

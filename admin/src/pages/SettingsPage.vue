@@ -53,15 +53,17 @@ onMounted(load)
 </script>
 
 <template>
+  <div class="page-frame">
   <PageHeader title="Settings" description="Site-wide contact details and social links." />
 
-  <form class="max-w-xl space-y-4 rounded-xl border border-neutral-200 bg-white p-5" @submit.prevent="save">
+  <form class="apple-card apple-card-body" style="max-width: 640px" @submit.prevent="save">
     <label v-for="field in fields" :key="field.key" class="block">
-      <span class="block text-sm font-medium text-neutral-700 mb-1">{{ field.label }}</span>
+      <span class="block text-sm font-medium ui-text mb-1">{{ field.label }}</span>
       <BaseTextarea v-if="field.textarea" v-model="values[field.key]" :rows="3" />
       <BaseInput v-else v-model="values[field.key]" />
     </label>
 
     <BaseButton type="submit" :disabled="saving">{{ saving ? 'Saving…' : 'Save settings' }}</BaseButton>
   </form>
+  </div>
 </template>

@@ -69,34 +69,35 @@ watch([() => route.query.job_opening_id, statusFilter], () => {
 </script>
 
 <template>
+  <div class="page-frame">
   <PageHeader title="Job Applications" description="Applicants who applied through the careers page.">
     <template #actions>
       <BaseSelect v-model="statusFilter" :options="statusOptions" />
     </template>
   </PageHeader>
 
-  <div class="overflow-hidden rounded-xl border border-neutral-200 bg-white">
-    <table class="w-full text-sm">
-      <thead class="bg-neutral-50 text-left text-xs uppercase tracking-wide text-neutral-500">
+  <div class="ui-table-wrap ui-table-scroll">
+    <table class="ui-table">
+      <thead>
         <tr>
-          <th class="px-4 py-3">Applicant</th>
-          <th class="px-4 py-3">Job</th>
-          <th class="px-4 py-3">Resume</th>
-          <th class="px-4 py-3">Status</th>
-          <th class="px-4 py-3"></th>
+          <th>Applicant</th>
+          <th>Job</th>
+          <th>Resume</th>
+          <th>Status</th>
+          <th></th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-neutral-100">
-        <tr v-for="application in items" :key="application.id" class="hover:bg-neutral-50">
-          <td class="px-4 py-3">
-            <p class="font-medium text-neutral-900">{{ application.name }}</p>
-            <p class="text-neutral-500">{{ application.email }}</p>
+      <tbody>
+        <tr v-for="application in items" :key="application.id">
+          <td>
+            <p class="font-medium ui-text">{{ application.name }}</p>
+            <p class="ui-text-2">{{ application.email }}</p>
           </td>
-          <td class="px-4 py-3">{{ application.job_title }}</td>
-          <td class="px-4 py-3">
+          <td>{{ application.job_title }}</td>
+          <td>
             <a :href="application.resume" target="_blank" class="underline">Download</a>
           </td>
-          <td class="px-4 py-3">
+          <td>
             <select
               class="rounded-md border border-neutral-300 px-2 py-1 text-sm"
               :value="application.status"
@@ -108,16 +109,17 @@ watch([() => route.query.job_opening_id, statusFilter], () => {
               <option value="hired">Hired</option>
             </select>
           </td>
-          <td class="px-4 py-3 text-right">
-            <button class="text-red-600 underline" @click="removeApplication(application.id)">Delete</button>
+          <td class="cell-actions">
+            <button class="ui-link-btn ui-link-btn--danger" @click="removeApplication(application.id)">Delete</button>
           </td>
         </tr>
         <tr v-if="!loading && items.length === 0">
-          <td colspan="5" class="px-4 py-8 text-center text-neutral-400">No applications yet.</td>
+          <td colspan="5" class="ui-table-empty">No applications yet.</td>
         </tr>
       </tbody>
     </table>
   </div>
 
   <Pagination :meta="meta" @change="goToPage" />
+  </div>
 </template>

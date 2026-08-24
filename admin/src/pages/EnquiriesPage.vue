@@ -40,37 +40,38 @@ async function removeEnquiry(id) {
 </script>
 
 <template>
+  <div class="page-frame">
   <PageHeader title="Enquiries" description="Contact form submissions from the public site." />
 
-  <div class="overflow-hidden rounded-xl border border-neutral-200 bg-white">
-    <table class="w-full text-sm">
-      <thead class="bg-neutral-50 text-left text-xs uppercase tracking-wide text-neutral-500">
+  <div class="ui-table-wrap ui-table-scroll">
+    <table class="ui-table">
+      <thead>
         <tr>
-          <th class="px-4 py-3">Name</th>
-          <th class="px-4 py-3">Enquiry</th>
-          <th class="px-4 py-3">Region / Country</th>
-          <th class="px-4 py-3">Status</th>
-          <th class="px-4 py-3">Received</th>
-          <th class="px-4 py-3"></th>
+          <th>Name</th>
+          <th>Enquiry</th>
+          <th>Region / Country</th>
+          <th>Status</th>
+          <th>Received</th>
+          <th></th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-neutral-100">
-        <tr v-for="enquiry in items" :key="enquiry.id" class="hover:bg-neutral-50">
-          <td class="px-4 py-3">
-            <p class="font-medium text-neutral-900">{{ enquiry.name }}</p>
-            <p class="text-neutral-500">{{ enquiry.email }}</p>
+      <tbody>
+        <tr v-for="enquiry in items" :key="enquiry.id">
+          <td>
+            <p class="font-medium ui-text">{{ enquiry.name }}</p>
+            <p class="ui-text-2">{{ enquiry.email }}</p>
           </td>
-          <td class="px-4 py-3">{{ enquiry.enquiry_type }}</td>
-          <td class="px-4 py-3">{{ enquiry.region }} / {{ enquiry.country }}</td>
-          <td class="px-4 py-3"><StatusBadge :status="enquiry.status" /></td>
-          <td class="px-4 py-3 text-neutral-500">{{ new Date(enquiry.created_at).toLocaleDateString() }}</td>
-          <td class="px-4 py-3 text-right">
-            <button class="text-brand-charcoal underline mr-3" @click="openEnquiry(enquiry)">View</button>
-            <button class="text-red-600 underline" @click="removeEnquiry(enquiry.id)">Delete</button>
+          <td>{{ enquiry.enquiry_type }}</td>
+          <td>{{ enquiry.region }} / {{ enquiry.country }}</td>
+          <td><StatusBadge :status="enquiry.status" /></td>
+          <td>{{ new Date(enquiry.created_at).toLocaleDateString() }}</td>
+          <td class="cell-actions">
+            <button class="ui-link-btn" @click="openEnquiry(enquiry)">View</button>
+            <button class="ui-link-btn ui-link-btn--danger" @click="removeEnquiry(enquiry.id)">Delete</button>
           </td>
         </tr>
         <tr v-if="!loading && items.length === 0">
-          <td colspan="6" class="px-4 py-8 text-center text-neutral-400">No enquiries yet.</td>
+          <td colspan="6" class="ui-table-empty">No enquiries yet.</td>
         </tr>
       </tbody>
     </table>
@@ -81,24 +82,25 @@ async function removeEnquiry(id) {
   <Modal :model-value="!!selected" title="Enquiry details" @update:model-value="selected = null">
     <template v-if="selected">
       <dl class="space-y-2 text-sm mb-4">
-        <div><dt class="text-neutral-500 inline">Name:</dt> <dd class="inline">{{ selected.name }}</dd></div>
-        <div><dt class="text-neutral-500 inline">Email:</dt> <dd class="inline">{{ selected.email }}</dd></div>
-        <div v-if="selected.company"><dt class="text-neutral-500 inline">Company:</dt> <dd class="inline">{{ selected.company }}</dd></div>
-        <div v-if="selected.phone"><dt class="text-neutral-500 inline">Phone:</dt> <dd class="inline">{{ selected.phone }}</dd></div>
-        <div><dt class="text-neutral-500 inline">Enquiring about:</dt> <dd class="inline">{{ selected.enquiry_type }}</dd></div>
-        <div><dt class="text-neutral-500 inline">Region / Country:</dt> <dd class="inline">{{ selected.region }} / {{ selected.country }}</dd></div>
+        <div><dt class="ui-text-2 inline">Name:</dt> <dd class="inline">{{ selected.name }}</dd></div>
+        <div><dt class="ui-text-2 inline">Email:</dt> <dd class="inline">{{ selected.email }}</dd></div>
+        <div v-if="selected.company"><dt class="ui-text-2 inline">Company:</dt> <dd class="inline">{{ selected.company }}</dd></div>
+        <div v-if="selected.phone"><dt class="ui-text-2 inline">Phone:</dt> <dd class="inline">{{ selected.phone }}</dd></div>
+        <div><dt class="ui-text-2 inline">Enquiring about:</dt> <dd class="inline">{{ selected.enquiry_type }}</dd></div>
+        <div><dt class="ui-text-2 inline">Region / Country:</dt> <dd class="inline">{{ selected.region }} / {{ selected.country }}</dd></div>
         <div>
-          <dt class="text-neutral-500 mb-1">Message:</dt>
-          <dd class="whitespace-pre-wrap rounded-md bg-neutral-50 p-3">{{ selected.message }}</dd>
+          <dt class="ui-text-2 mb-1">Message:</dt>
+          <dd class="whitespace-pre-wrap rounded-md ui-surface-2 p-3">{{ selected.message }}</dd>
         </div>
       </dl>
 
       <label class="block mb-4">
-        <span class="block text-sm font-medium text-neutral-700 mb-1">Status</span>
+        <span class="block text-sm font-medium ui-text mb-1">Status</span>
         <BaseSelect v-model="selected.status" :options="statusOptions" />
       </label>
 
       <BaseButton @click="saveStatus">Save status</BaseButton>
     </template>
   </Modal>
+  </div>
 </template>

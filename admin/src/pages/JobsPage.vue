@@ -93,6 +93,7 @@ async function removeJob(id) {
 </script>
 
 <template>
+  <div class="page-frame">
   <PageHeader title="Job Openings" description="Careers page listings.">
     <template #actions>
       <SearchInput v-model="search" placeholder="Search job openings…" />
@@ -100,34 +101,34 @@ async function removeJob(id) {
     </template>
   </PageHeader>
 
-  <div class="overflow-hidden rounded-xl border border-neutral-200 bg-white">
-    <table class="w-full text-sm">
-      <thead class="bg-neutral-50 text-left text-xs uppercase tracking-wide text-neutral-500">
+  <div class="ui-table-wrap ui-table-scroll">
+    <table class="ui-table">
+      <thead>
         <tr>
-          <th class="px-4 py-3">Title</th>
-          <th class="px-4 py-3">Location</th>
-          <th class="px-4 py-3">Status</th>
-          <th class="px-4 py-3">Applications</th>
-          <th class="px-4 py-3"></th>
+          <th>Title</th>
+          <th>Location</th>
+          <th>Status</th>
+          <th>Applications</th>
+          <th></th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-neutral-100">
-        <tr v-for="job in items" :key="job.id" class="hover:bg-neutral-50">
-          <td class="px-4 py-3 font-medium text-neutral-900">{{ job.title }}</td>
-          <td class="px-4 py-3">{{ job.location }}</td>
-          <td class="px-4 py-3"><StatusBadge :status="job.status" /></td>
-          <td class="px-4 py-3">
+      <tbody>
+        <tr v-for="job in items" :key="job.id">
+          <td class="cell-strong">{{ job.title }}</td>
+          <td>{{ job.location }}</td>
+          <td><StatusBadge :status="job.status" /></td>
+          <td>
             <RouterLink :to="{ name: 'job-applications', query: { job_opening_id: job.id } }" class="underline">
               {{ job.applications_count ?? 0 }}
             </RouterLink>
           </td>
-          <td class="px-4 py-3 text-right">
-            <button class="text-brand-charcoal underline mr-3" @click="openEdit(job)">Edit</button>
-            <button class="text-red-600 underline" @click="removeJob(job.id)">Delete</button>
+          <td class="cell-actions">
+            <button class="ui-link-btn" @click="openEdit(job)">Edit</button>
+            <button class="ui-link-btn ui-link-btn--danger" @click="removeJob(job.id)">Delete</button>
           </td>
         </tr>
         <tr v-if="!loading && items.length === 0">
-          <td colspan="5" class="px-4 py-8 text-center text-neutral-400">No job openings found.</td>
+          <td colspan="5" class="ui-table-empty">No job openings found.</td>
         </tr>
       </tbody>
     </table>
@@ -169,4 +170,5 @@ async function removeJob(id) {
       </div>
     </form>
   </Modal>
+  </div>
 </template>

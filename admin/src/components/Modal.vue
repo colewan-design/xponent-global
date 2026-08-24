@@ -1,5 +1,6 @@
 <script setup>
 import { nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import AppIcon from './AppIcon.vue'
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
@@ -62,25 +63,22 @@ onBeforeUnmount(() => {
 
 <template>
   <Teleport to="body">
-    <div v-if="modelValue" class="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto bg-black/40 p-4 py-10">
+    <div v-if="modelValue" class="ui-dialog-backdrop">
       <div
         ref="dialogRef"
         role="dialog"
         aria-modal="true"
         :aria-labelledby="titleId"
-        class="w-full rounded-xl bg-white shadow-xl"
-        :class="wide ? 'max-w-2xl' : 'max-w-lg'"
+        class="ui-dialog"
+        :class="{ 'ui-dialog--wide': wide }"
       >
-        <div class="flex items-center justify-between border-b border-neutral-200 px-5 py-4">
-          <h2 :id="titleId" class="text-base font-semibold text-neutral-900">{{ title }}</h2>
-          <button
-            class="text-neutral-400 hover:text-neutral-700"
-            @click="$emit('update:modelValue', false)"
-          >
-            ✕
+        <div class="ui-dialog-header">
+          <h2 :id="titleId" class="ui-dialog-title">{{ title }}</h2>
+          <button class="ui-dialog-close" aria-label="Close" @click="$emit('update:modelValue', false)">
+            <AppIcon name="x" :size="16" />
           </button>
         </div>
-        <div class="px-5 py-5">
+        <div class="ui-dialog-body">
           <slot />
         </div>
       </div>

@@ -54,34 +54,35 @@ async function removeLocation(id) {
 </script>
 
 <template>
+  <div class="page-frame">
   <PageHeader title="Office Locations" description="Shown on About > Where We Operate and the Contact page.">
     <template #actions>
       <BaseButton @click="openCreate">Add Location</BaseButton>
     </template>
   </PageHeader>
 
-  <div class="overflow-hidden rounded-xl border border-neutral-200 bg-white">
-    <table class="w-full text-sm">
-      <thead class="bg-neutral-50 text-left text-xs uppercase tracking-wide text-neutral-500">
+  <div class="ui-table-wrap ui-table-scroll">
+    <table class="ui-table">
+      <thead>
         <tr>
-          <th class="px-4 py-3">Label</th>
-          <th class="px-4 py-3">Address</th>
-          <th class="px-4 py-3">Country</th>
-          <th class="px-4 py-3"></th>
+          <th>Label</th>
+          <th>Address</th>
+          <th>Country</th>
+          <th></th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-neutral-100">
-        <tr v-for="location in items" :key="location.id" class="hover:bg-neutral-50">
-          <td class="px-4 py-3 font-medium text-neutral-900">{{ location.label }}</td>
-          <td class="px-4 py-3 text-neutral-500">{{ location.address }}, {{ location.city }}</td>
-          <td class="px-4 py-3">{{ location.country }}</td>
-          <td class="px-4 py-3 text-right">
-            <button class="text-brand-charcoal underline mr-3" @click="openEdit(location)">Edit</button>
-            <button class="text-red-600 underline" @click="removeLocation(location.id)">Delete</button>
+      <tbody>
+        <tr v-for="location in items" :key="location.id">
+          <td class="cell-strong">{{ location.label }}</td>
+          <td>{{ location.address }}, {{ location.city }}</td>
+          <td>{{ location.country }}</td>
+          <td class="cell-actions">
+            <button class="ui-link-btn" @click="openEdit(location)">Edit</button>
+            <button class="ui-link-btn ui-link-btn--danger" @click="removeLocation(location.id)">Delete</button>
           </td>
         </tr>
         <tr v-if="!loading && items.length === 0">
-          <td colspan="4" class="px-4 py-8 text-center text-neutral-400">No office locations yet.</td>
+          <td colspan="4" class="ui-table-empty">No office locations yet.</td>
         </tr>
       </tbody>
     </table>
@@ -112,4 +113,5 @@ async function removeLocation(id) {
       </div>
     </form>
   </Modal>
+  </div>
 </template>

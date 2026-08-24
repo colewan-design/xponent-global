@@ -5,6 +5,7 @@ import PageHeader from '../components/PageHeader.vue'
 import BaseButton from '../components/BaseButton.vue'
 import BaseInput from '../components/BaseInput.vue'
 import BaseTextarea from '../components/BaseTextarea.vue'
+import ImagePreview from '../components/ImagePreview.vue'
 import { useToastStore } from '../stores/toast'
 
 const toast = useToastStore()
@@ -53,14 +54,15 @@ onMounted(load)
 </script>
 
 <template>
+  <div class="page-frame">
   <PageHeader title="Page Content" description="Editable copy blocks for About, Sustainability, Home, and Careers." />
 
-  <div class="mb-4 flex gap-2">
+  <div class="ui-tabs">
     <button
       v-for="page in pages"
       :key="page.value"
-      class="rounded-md px-3 py-1.5 text-sm font-medium"
-      :class="activePage === page.value ? 'bg-brand-charcoal text-white' : 'bg-white border border-neutral-300 text-neutral-600'"
+      class="ui-tab"
+      :class="{ active: activePage === page.value }"
       @click="activePage = page.value"
     >
       {{ page.label }}
@@ -71,29 +73,31 @@ onMounted(load)
     <div
       v-for="(section, index) in byPage[activePage]"
       :key="index"
-      class="rounded-xl border border-neutral-200 bg-white p-4"
+      class="apple-card apple-card-body"
     >
       <div class="mb-3 flex items-center justify-between">
-        <p class="text-sm font-medium text-neutral-500">Section {{ index + 1 }}</p>
-        <button class="text-xs text-red-600 underline" @click="removeSection(index)">Remove</button>
+        <p class="text-sm font-medium ui-text-2">Section {{ index + 1 }}</p>
+        <button class="ui-link-btn ui-link-btn--danger" style="font-size: 12px" @click="removeSection(index)">Remove</button>
       </div>
       <label class="block mb-3">
-        <span class="block text-sm font-medium text-neutral-700 mb-1">Heading</span>
+        <span class="block text-sm font-medium ui-text mb-1">Heading</span>
         <BaseInput v-model="section.heading" />
       </label>
       <label class="block mb-3">
-        <span class="block text-sm font-medium text-neutral-700 mb-1">Body</span>
+        <span class="block text-sm font-medium ui-text mb-1">Body</span>
         <BaseTextarea v-model="section.body" :rows="4" />
       </label>
       <label class="block">
-        <span class="block text-sm font-medium text-neutral-700 mb-1">Image path</span>
+        <span class="block text-sm font-medium ui-text mb-1">Image path</span>
         <BaseInput v-model="section.image" placeholder="seed/gallery-img-01.jpg" />
       </label>
+      <ImagePreview :path="section.image" />
     </div>
 
     <div class="flex items-center justify-between">
       <button class="text-sm underline" @click="addSection">+ Add section</button>
       <BaseButton :disabled="saving" @click="save">{{ saving ? 'Saving…' : 'Save changes' }}</BaseButton>
     </div>
+  </div>
   </div>
 </template>

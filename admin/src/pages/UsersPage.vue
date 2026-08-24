@@ -59,32 +59,33 @@ async function removeUser(id) {
 </script>
 
 <template>
+  <div class="page-frame">
   <PageHeader title="Admin Users" description="People who can sign in to this admin console.">
     <template #actions>
       <BaseButton @click="openCreate">New User</BaseButton>
     </template>
   </PageHeader>
 
-  <div class="overflow-hidden rounded-xl border border-neutral-200 bg-white">
-    <table class="w-full text-sm">
-      <thead class="bg-neutral-50 text-left text-xs uppercase tracking-wide text-neutral-500">
+  <div class="ui-table-wrap ui-table-scroll">
+    <table class="ui-table">
+      <thead>
         <tr>
-          <th class="px-4 py-3">Name</th>
-          <th class="px-4 py-3">Email</th>
-          <th class="px-4 py-3">Role</th>
-          <th class="px-4 py-3"></th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th></th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-neutral-100">
-        <tr v-for="user in items" :key="user.id" class="hover:bg-neutral-50">
-          <td class="px-4 py-3 font-medium text-neutral-900">{{ user.name }}</td>
-          <td class="px-4 py-3">{{ user.email }}</td>
-          <td class="px-4 py-3 capitalize">{{ user.role }}</td>
-          <td class="px-4 py-3 text-right">
-            <button class="text-brand-charcoal underline mr-3" @click="openEdit(user)">Edit</button>
+      <tbody>
+        <tr v-for="user in items" :key="user.id">
+          <td class="cell-strong">{{ user.name }}</td>
+          <td>{{ user.email }}</td>
+          <td class="capitalize">{{ user.role }}</td>
+          <td class="cell-actions">
+            <button class="ui-link-btn" @click="openEdit(user)">Edit</button>
             <button
               v-if="user.id !== auth.user?.id"
-              class="text-red-600 underline"
+              class="ui-link-btn ui-link-btn--danger"
               @click="removeUser(user.id)"
             >
               Delete
@@ -92,7 +93,7 @@ async function removeUser(id) {
           </td>
         </tr>
         <tr v-if="!loading && items.length === 0">
-          <td colspan="4" class="px-4 py-8 text-center text-neutral-400">No users yet.</td>
+          <td colspan="4" class="ui-table-empty">No users yet.</td>
         </tr>
       </tbody>
     </table>
@@ -118,4 +119,5 @@ async function removeUser(id) {
       </div>
     </form>
   </Modal>
+  </div>
 </template>

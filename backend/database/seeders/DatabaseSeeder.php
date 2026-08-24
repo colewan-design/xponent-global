@@ -37,6 +37,11 @@ class DatabaseSeeder extends Seeder
         $this->seedNewsletterSubscribers();
         $this->seedContactEnquiries();
         $this->seedJobApplications();
+
+        // Products, warehouses, stock and orders. Kept in its own seeder rather
+        // than as another private method here — it depends on InventoryService
+        // to post its opening balances, which none of the content seeds do.
+        $this->call(CommerceSeeder::class);
     }
 
     private function seedUsers(): void

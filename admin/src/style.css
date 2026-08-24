@@ -1,11 +1,12 @@
 @import "tailwindcss";
+@import "./assets/theme.css";
 
+/* Tailwind's own theme is kept in step with the design tokens in theme.css so
+   that utility classes used inside pages resolve to the same palette as the
+   hand-written component classes. theme.css stays the source of truth for the
+   hue — these read it rather than restating it. */
 @theme {
   --color-brand-gold: #eeb500;
   --color-brand-charcoal: #1d1d1d;
-  --font-sans: 'Jost', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-}
-
-body {
-  @apply bg-neutral-100 text-neutral-800 antialiased;
+  --font-sans: 'Jost', -apple-system, 'SF Pro Display', Inter, system-ui, sans-serif;
 }

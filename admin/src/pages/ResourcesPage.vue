@@ -81,6 +81,7 @@ async function removeResource(id) {
 </script>
 
 <template>
+  <div class="page-frame">
   <PageHeader title="Resources" description="Technical documents, datasheets, and safety & compliance files.">
     <template #actions>
       <SearchInput v-model="search" placeholder="Search resources…" />
@@ -88,30 +89,30 @@ async function removeResource(id) {
     </template>
   </PageHeader>
 
-  <div class="overflow-hidden rounded-xl border border-neutral-200 bg-white">
-    <table class="w-full text-sm">
-      <thead class="bg-neutral-50 text-left text-xs uppercase tracking-wide text-neutral-500">
+  <div class="ui-table-wrap ui-table-scroll">
+    <table class="ui-table">
+      <thead>
         <tr>
-          <th class="px-4 py-3">Title</th>
-          <th class="px-4 py-3">Category</th>
-          <th class="px-4 py-3">Published</th>
-          <th class="px-4 py-3"></th>
+          <th>Title</th>
+          <th>Category</th>
+          <th>Published</th>
+          <th></th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-neutral-100">
-        <tr v-for="resource in items" :key="resource.id" class="hover:bg-neutral-50">
-          <td class="px-4 py-3">
-            <a :href="resource.file" target="_blank" class="font-medium text-neutral-900 hover:underline">{{ resource.title }}</a>
+      <tbody>
+        <tr v-for="resource in items" :key="resource.id">
+          <td>
+            <a :href="resource.file" target="_blank" class="font-medium ui-text hover:underline">{{ resource.title }}</a>
           </td>
-          <td class="px-4 py-3 capitalize">{{ resource.category.replace('_', ' ') }}</td>
-          <td class="px-4 py-3">{{ resource.published ? 'Yes' : 'No' }}</td>
-          <td class="px-4 py-3 text-right">
-            <button class="text-brand-charcoal underline mr-3" @click="openEdit(resource)">Edit</button>
-            <button class="text-red-600 underline" @click="removeResource(resource.id)">Delete</button>
+          <td class="capitalize">{{ resource.category.replace('_', ' ') }}</td>
+          <td>{{ resource.published ? 'Yes' : 'No' }}</td>
+          <td class="cell-actions">
+            <button class="ui-link-btn" @click="openEdit(resource)">Edit</button>
+            <button class="ui-link-btn ui-link-btn--danger" @click="removeResource(resource.id)">Delete</button>
           </td>
         </tr>
         <tr v-if="!loading && items.length === 0">
-          <td colspan="4" class="px-4 py-8 text-center text-neutral-400">No resources found.</td>
+          <td colspan="4" class="ui-table-empty">No resources found.</td>
         </tr>
       </tbody>
     </table>
@@ -133,7 +134,7 @@ async function removeResource(id) {
       <FormField label="File" :required="!editingId" hint="PDF, Word, or Excel document.">
         <FileInput accept=".pdf,.doc,.docx,.xls,.xlsx" @change="(f) => (file = f)" />
       </FormField>
-      <label class="flex items-center gap-2 mb-4 text-sm text-neutral-700">
+      <label class="flex items-center gap-2 mb-4 text-sm ui-text">
         <input v-model="form.published" type="checkbox" class="rounded border-neutral-300" />
         Published
       </label>
@@ -143,4 +144,5 @@ async function removeResource(id) {
       </div>
     </form>
   </Modal>
+  </div>
 </template>

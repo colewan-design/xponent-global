@@ -59,6 +59,31 @@ const routes = [
     component: () => import('../pages/OfficeLocationsPage.vue'),
   },
   {
+    path: '/orders',
+    name: 'orders',
+    component: () => import('../pages/commerce/OrdersPage.vue'),
+  },
+  {
+    path: '/products',
+    name: 'products',
+    component: () => import('../pages/commerce/ProductsPage.vue'),
+  },
+  {
+    path: '/product-categories',
+    name: 'product-categories',
+    component: () => import('../pages/commerce/ProductCategoriesPage.vue'),
+  },
+  {
+    path: '/inventory',
+    name: 'inventory',
+    component: () => import('../pages/commerce/InventoryPage.vue'),
+  },
+  {
+    path: '/warehouses',
+    name: 'warehouses',
+    component: () => import('../pages/commerce/WarehousesPage.vue'),
+  },
+  {
     path: '/solutions',
     name: 'solutions',
     component: () => import('../pages/solutions/SolutionsPage.vue'),

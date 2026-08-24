@@ -78,6 +78,7 @@ async function move(index, direction) {
 </script>
 
 <template>
+  <div class="page-frame">
   <PageHeader title="Gallery" description="Photos shown on the public Gallery page.">
     <template #actions>
       <SearchInput v-model="search" placeholder="Search captions…" />
@@ -89,7 +90,7 @@ async function move(index, direction) {
     <div
       v-for="(item, index) in items"
       :key="item.id"
-      class="group relative overflow-hidden rounded-lg border border-neutral-200 bg-white"
+      class="group relative overflow-hidden apple-card"
     >
       <img :src="item.image" :alt="item.caption ?? ''" class="h-36 w-full object-cover" />
       <div class="absolute inset-0 flex flex-col justify-between bg-black/0 p-2 opacity-0 transition-opacity group-hover:bg-black/40 group-hover:opacity-100">
@@ -117,7 +118,7 @@ async function move(index, direction) {
         </div>
       </div>
     </div>
-    <p v-if="!loading && items.length === 0" class="col-span-full py-8 text-center text-neutral-400">
+    <p v-if="!loading && items.length === 0" class="col-span-full py-8 text-center ui-muted">
       No images found.
     </p>
   </div>
@@ -141,4 +142,5 @@ async function move(index, direction) {
       </div>
     </form>
   </Modal>
+  </div>
 </template>

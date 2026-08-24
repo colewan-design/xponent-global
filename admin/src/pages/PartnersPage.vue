@@ -103,6 +103,7 @@ async function move(index, direction) {
 </script>
 
 <template>
+  <div class="page-frame">
   <PageHeader title="Clients & Partners" description="Logos shown on Our Clients, Our Brand Partners, and About > Affiliations.">
     <template #actions>
       <SearchInput v-model="search" placeholder="Search by name…" />
@@ -110,12 +111,12 @@ async function move(index, direction) {
     </template>
   </PageHeader>
 
-  <div class="mb-4 flex gap-2">
+  <div class="ui-tabs">
     <button
       v-for="tab in typeTabs"
       :key="tab.value"
-      class="rounded-md px-3 py-1.5 text-sm font-medium"
-      :class="activeType === tab.value ? 'bg-brand-charcoal text-white' : 'bg-white border border-neutral-300 text-neutral-600'"
+      class="ui-tab"
+      :class="{ active: activeType === tab.value }"
       @click="activeType = tab.value"
     >
       {{ tab.label }}
@@ -123,19 +124,19 @@ async function move(index, direction) {
   </div>
 
   <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-    <div v-for="(item, index) in items" :key="item.id" class="rounded-lg border border-neutral-200 bg-white p-3">
+    <div v-for="(item, index) in items" :key="item.id" class="inner-card" style="padding: 12px">
       <img :src="item.logo" :alt="item.name" class="mb-2 h-16 w-full object-contain" />
-      <p class="truncate text-sm font-medium text-neutral-900">{{ item.name }}</p>
+      <p class="truncate text-sm font-medium ui-text">{{ item.name }}</p>
       <div class="mt-2 flex items-center justify-between text-xs">
         <div class="flex gap-1">
           <button class="disabled:opacity-30" :disabled="index === 0" title="Move earlier" @click="move(index, -1)">↑</button>
           <button class="disabled:opacity-30" :disabled="index === items.length - 1" title="Move later" @click="move(index, 1)">↓</button>
         </div>
-        <button class="text-brand-charcoal underline" @click="openEdit(item)">Edit</button>
-        <button class="text-red-600 underline" @click="removePartner(item.id)">Delete</button>
+        <button class="ui-link-btn" @click="openEdit(item)">Edit</button>
+        <button class="ui-link-btn ui-link-btn--danger" @click="removePartner(item.id)">Delete</button>
       </div>
     </div>
-    <p v-if="!loading && items.length === 0" class="col-span-full py-8 text-center text-neutral-400">
+    <p v-if="!loading && items.length === 0" class="col-span-full py-8 text-center ui-muted">
       Nothing found.
     </p>
   </div>
@@ -168,4 +169,5 @@ async function move(index, direction) {
       </div>
     </form>
   </Modal>
+  </div>
 </template>

@@ -143,6 +143,7 @@ async function moveItem(category, index, direction) {
 </script>
 
 <template>
+  <div class="page-frame">
   <PageHeader title="Solutions Catalogue" description="Product categories and items shown on the Solutions page.">
     <template #actions>
       <BaseButton @click="openCreateCategory">New Category</BaseButton>
@@ -150,13 +151,13 @@ async function moveItem(category, index, direction) {
   </PageHeader>
 
   <div class="space-y-3">
-    <div v-for="(category, categoryIndex) in categories.items.value" :key="category.id" class="rounded-xl border border-neutral-200 bg-white">
+    <div v-for="(category, categoryIndex) in categories.items.value" :key="category.id" class="apple-card">
       <div class="flex items-center justify-between px-4 py-3">
         <button class="flex items-center gap-3 text-left" @click="toggleExpand(category.id)">
           <img v-if="category.image" :src="category.image" class="h-10 w-10 rounded object-cover" alt="" />
           <div>
-            <p class="font-medium text-neutral-900">{{ category.title }}</p>
-            <p class="text-xs text-neutral-500">{{ category.items?.length ?? 0 }} items</p>
+            <p class="font-medium ui-text">{{ category.title }}</p>
+            <p class="text-xs ui-text-2">{{ category.items?.length ?? 0 }} items</p>
           </div>
         </button>
         <div class="flex items-center gap-3 text-sm">
@@ -179,17 +180,17 @@ async function moveItem(category, index, direction) {
             </button>
           </div>
           <button class="underline" @click="openCreateItem(category.id)">Add item</button>
-          <button class="text-brand-charcoal underline" @click="openEditCategory(category)">Edit</button>
-          <button class="text-red-600 underline" @click="removeCategory(category.id)">Delete</button>
+          <button class="ui-link-btn" @click="openEditCategory(category)">Edit</button>
+          <button class="ui-link-btn ui-link-btn--danger" @click="removeCategory(category.id)">Delete</button>
         </div>
       </div>
 
       <div v-if="expanded === category.id" class="border-t border-neutral-100 px-4 py-3">
-        <div v-if="!category.items?.length" class="text-sm text-neutral-400 py-2">No items in this category yet.</div>
+        <div v-if="!category.items?.length" class="text-sm ui-muted py-2">No items in this category yet.</div>
         <div v-for="(item, itemIndex) in category.items" :key="item.id" class="flex items-center justify-between border-b border-neutral-100 py-2 last:border-0">
           <div class="flex items-center gap-3">
             <img v-if="item.image" :src="item.image" class="h-8 w-8 rounded object-cover" alt="" />
-            <p class="text-sm text-neutral-800">{{ item.title }}</p>
+            <p class="text-sm ui-text">{{ item.title }}</p>
           </div>
           <div class="flex items-center gap-3 text-xs">
             <div class="flex gap-1">
@@ -210,14 +211,14 @@ async function moveItem(category, index, direction) {
                 ↓
               </button>
             </div>
-            <button class="text-brand-charcoal underline" @click="openEditItem(item)">Edit</button>
-            <button class="text-red-600 underline" @click="removeItem(item.id)">Delete</button>
+            <button class="ui-link-btn" @click="openEditItem(item)">Edit</button>
+            <button class="ui-link-btn ui-link-btn--danger" @click="removeItem(item.id)">Delete</button>
           </div>
         </div>
       </div>
     </div>
 
-    <p v-if="!categories.loading.value && categories.items.value.length === 0" class="py-8 text-center text-neutral-400">
+    <p v-if="!categories.loading.value && categories.items.value.length === 0" class="py-8 text-center ui-muted">
       No solution categories yet.
     </p>
   </div>
@@ -263,4 +264,5 @@ async function moveItem(category, index, direction) {
       </div>
     </form>
   </Modal>
+  </div>
 </template>

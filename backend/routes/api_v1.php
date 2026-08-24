@@ -3,18 +3,23 @@
 use App\Http\Controllers\Api\Admin\ContactEnquiryController as AdminContactEnquiryController;
 use App\Http\Controllers\Api\Admin\DashboardController;
 use App\Http\Controllers\Api\Admin\GalleryImageController as AdminGalleryImageController;
+use App\Http\Controllers\Api\Admin\InventoryController as AdminInventoryController;
 use App\Http\Controllers\Api\Admin\JobApplicationController as AdminJobApplicationController;
 use App\Http\Controllers\Api\Admin\JobOpeningController as AdminJobOpeningController;
 use App\Http\Controllers\Api\Admin\NewsletterSubscriberController as AdminNewsletterSubscriberController;
 use App\Http\Controllers\Api\Admin\OfficeLocationController as AdminOfficeLocationController;
+use App\Http\Controllers\Api\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Api\Admin\PageContentController as AdminPageContentController;
 use App\Http\Controllers\Api\Admin\PartnerController as AdminPartnerController;
 use App\Http\Controllers\Api\Admin\PostController as AdminPostController;
+use App\Http\Controllers\Api\Admin\ProductCategoryController as AdminProductCategoryController;
+use App\Http\Controllers\Api\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Api\Admin\ResourceController as AdminResourceController;
 use App\Http\Controllers\Api\Admin\SettingController as AdminSettingController;
 use App\Http\Controllers\Api\Admin\SolutionCategoryController as AdminSolutionCategoryController;
 use App\Http\Controllers\Api\Admin\SolutionItemController as AdminSolutionItemController;
 use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Api\Admin\WarehouseController as AdminWarehouseController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ContactEnquiryController;
 use App\Http\Controllers\Api\GalleryImageController;
@@ -96,6 +101,29 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
     Route::apiResource('office-locations', AdminOfficeLocationController::class);
     Route::apiResource('solution-categories', AdminSolutionCategoryController::class);
     Route::apiResource('solution-items', AdminSolutionItemController::class);
+
+    /*
+    |----------------------------------------------------------------------
+    | Commerce — products, stock and orders.
+    |----------------------------------------------------------------------
+    |
+    | The three are one system: an order reserves and later deducts stock at
+    | a warehouse, and every balance change is posted to the movement ledger.
+    | See App\Services\InventoryService for the rules that tie them together.
+    */
+    Route::apiResource('product-categories', AdminProductCategoryController::class);
+    Route::apiResource('products', AdminProductController::class);
+    Route::apiResource('warehouses', AdminWarehouseController::class);
+
+    // Stock levels are read and configured as a resource, but never *written*
+    // as one — a balance only moves through a posted movement.
+    Route::get('/inventory', [AdminInventoryController::class, 'index']);
+    Route::put('/inventory/{inventory}', [AdminInventoryController::class, 'update']);
+    Route::post('/inventory/adjust', [AdminInventoryController::class, 'adjust']);
+    Route::get('/stock-movements', [AdminInventoryController::class, 'movements']);
+
+    Route::apiResource('orders', AdminOrderController::class);
+    Route::patch('/orders/{order}/status', [AdminOrderController::class, 'updateStatus']);
 
     Route::get('/page-content', [AdminPageContentController::class, 'index']);
     Route::put('/page-content/{page}', [AdminPageContentController::class, 'update']);

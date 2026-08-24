@@ -8,10 +8,10 @@ defineEmits(['update:modelValue'])
 
 <template>
   <input
+    class="ui-search"
     :value="modelValue"
     type="search"
     :placeholder="placeholder"
-    class="w-64 rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-brand-gold focus:outline-none focus:ring-1 focus:ring-brand-gold"
     @input="$emit('update:modelValue', $event.target.value)"
   />
 </template>
