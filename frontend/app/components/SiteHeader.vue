@@ -14,6 +14,7 @@
 const { data: settings } = await useApiFetch('/settings', { key: 'site-settings' })
 
 const route = useRoute()
+const isAboutPage = computed(() => route.path === '/about')
 
 const isMenuOpen = ref(false)
 /** Which desktop sheet is open, by index into `nav`. Null when none is. */
@@ -116,7 +117,7 @@ watch(
 </script>
 
 <template>
-  <header class="sticky top-0 z-50">
+  <header v-if="!isAboutPage" class="sticky top-0 z-50">
     <!-- 1 — Contact strip -->
     <div class="bg-smoke">
       <p class="container-retail-wide flex flex-wrap items-center justify-center gap-x-3 gap-y-1 py-2 text-center text-[0.8rem] leading-snug text-ink/80">

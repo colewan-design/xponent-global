@@ -42,6 +42,12 @@ dist/
 # --- Logs and local scratch ----------------------------------------------
 *.log
 .phpunit.result.cache
+frontend/.nuxt-dev.err
+frontend/test-results/
+
+# Reference sites pulled down to compare designs against. Not part of the build,
+# and large: the archive alone is 2.5 MB.
+downloads/
 
 # --- OS / editor ----------------------------------------------------------
 .DS_Store
