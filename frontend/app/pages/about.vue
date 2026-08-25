@@ -285,10 +285,44 @@ const commandHotspotStyle = (state) => ({
   '--spot-duration': `${state.pulseDuration}s`,
 })
 
+/*
+ * Anchor and offset are handed over separately so the stylesheet decides how the
+ * two combine. Wide, the label stands beside its dot; on a phone there is no room
+ * to the right of one, so the same anchor is reused with the label centred under
+ * it instead — a breakpoint the inline style cannot see, and a resize would not
+ * re-run it anyway.
+ */
 const commandLabelStyle = (state) => ({
-  left: `${state.x + state.labelDx}%`,
-  top: `${state.y + state.labelDy}%`,
+  '--label-x': `${state.x}%`,
+  '--label-y': `${state.y}%`,
+  '--label-dx': `${state.labelDx}%`,
+  '--label-dy': `${state.labelDy}%`,
 })
+
+/*
+ * The command mask is drawn for a landscape frame. Held to those insets on a
+ * portrait viewport it reads as a slot down the middle of the screen, so the x
+ * coordinates are spread about the centre line. Point for point, in order — the
+ * polygon still has to morph against its opened twin.
+ */
+const spreadMaskX = (mask, spread) =>
+  spread === 1
+    ? mask
+    : mask.replace(
+        /(-?[\d.]+)%\s+(-?[\d.]+)%/g,
+        (_, x, y) => `${Number((50 + (Number(x) - 50) * spread).toFixed(2))}% ${y}%`,
+      )
+
+/*
+ * Scene lengths live in the stylesheet, where the copy that has to land on them
+ * is positioned, and are read back here so a breakpoint only has to restate them
+ * in one place.
+ */
+const sceneScreens = (element, name, fallback) => {
+  const raw = Number.parseFloat(getComputedStyle(element).getPropertyValue(name))
+
+  return Number.isFinite(raw) ? raw : fallback
+}
 
 const setCommandHotspotRef = (element) => {
   if (element) commandHotspotRefs.value.push(element)
@@ -434,6 +468,14 @@ const setupScrollScenes = async () => {
   const Lenis = lenisModule.default || lenisModule.Lenis
 
   gsap.registerPlugin(ScrollTrigger)
+
+  /*
+   * A phone's address bar sliding away fires a resize, and a refresh mid-scrub
+   * snaps a pinned scene to the new measurements under the thumb. Every height in
+   * these scenes is svh, which that collapse does not change, so there is nothing
+   * to re-measure — an orientation change still refreshes.
+   */
+  ScrollTrigger.config({ ignoreMobileResize: true })
 
   const refreshTimers = []
   let destroyLenis = () => {}
@@ -626,7 +668,15 @@ const setupScrollScenes = async () => {
 
     const mm = gsap.matchMedia()
 
-    mm.add('(min-width: 1024px)', () => {
+    /*
+     * One scene at every width. The conditions object is what keeps it one: both
+     * branches run the same timeline off the same beats, and the handful of things
+     * a phone cannot take at desktop measure — the width of the mask, the length
+     * of the runway — are read from `compact` rather than forked into a second
+     * copy that would drift.
+     */
+    mm.add({ compact: '(max-width: 1023px)', wide: '(min-width: 1024px)' }, (context) => {
+      const compact = Boolean(context.conditions.compact)
       const hotspots = commandHotspotRefs.value
       const labels = commandLabelRefs.value
       const field = commandFieldRef.value
@@ -637,7 +687,9 @@ const setupScrollScenes = async () => {
       // between them: every notch in commandMask collapses onto the straight edge
       // of fullMask (its two risers share one point there). Four tabs per edge.
       const fullMask = 'polygon(0% 0%,11% 0%,11% 0%,22% 0%,22% 0%,33% 0%,33% 0%,44% 0%,44% 0%,56% 0%,56% 0%,67% 0%,67% 0%,78% 0%,78% 0%,89% 0%,89% 0%,100% 0%,100% 11%,100% 11%,100% 22%,100% 22%,100% 33%,100% 33%,100% 44%,100% 44%,100% 56%,100% 56%,100% 67%,100% 67%,100% 78%,100% 78%,100% 89%,100% 89%,100% 100%,89% 100%,89% 100%,78% 100%,78% 100%,67% 100%,67% 100%,56% 100%,56% 100%,44% 100%,44% 100%,33% 100%,33% 100%,22% 100%,22% 100%,11% 100%,11% 100%,0% 100%,0% 89%,0% 89%,0% 78%,0% 78%,0% 67%,0% 67%,0% 56%,0% 56%,0% 44%,0% 44%,0% 33%,0% 33%,0% 22%,0% 22%,0% 11%,0% 11%)'
-      const commandMask = 'polygon(18% 8%,25% 8%,25% 4%,32% 4%,32% 8%,39% 8%,39% 11%,46% 11%,46% 8%,54% 8%,54% 3%,61% 3%,61% 8%,68% 8%,68% 5%,75% 5%,75% 10%,82% 10%,82% 19%,85% 19%,85% 28%,82% 28%,82% 36%,79% 36%,79% 45%,82% 45%,82% 55%,86% 55%,86% 64%,82% 64%,82% 72%,85% 72%,85% 81%,82% 81%,82% 90%,75% 90%,75% 95%,68% 95%,68% 90%,61% 90%,61% 87%,54% 87%,54% 90%,46% 90%,46% 94%,39% 94%,39% 90%,32% 90%,32% 95%,25% 95%,25% 90%,18% 90%,18% 81%,15% 81%,15% 72%,18% 72%,18% 63%,21% 63%,21% 54%,18% 54%,18% 44%,14% 44%,14% 35%,18% 35%,18% 26%,15% 26%,15% 17%,18% 17%)'
+      // Spread to the frame edges on a phone: 1.32 carries the outermost inset
+      // from 14% out to about 3%, which is the same margin the wide frame keeps.
+      const commandMask = spreadMaskX('polygon(18% 8%,25% 8%,25% 4%,32% 4%,32% 8%,39% 8%,39% 11%,46% 11%,46% 8%,54% 8%,54% 3%,61% 3%,61% 8%,68% 8%,68% 5%,75% 5%,75% 10%,82% 10%,82% 19%,85% 19%,85% 28%,82% 28%,82% 36%,79% 36%,79% 45%,82% 45%,82% 55%,86% 55%,86% 64%,82% 64%,82% 72%,85% 72%,85% 81%,82% 81%,82% 90%,75% 90%,75% 95%,68% 95%,68% 90%,61% 90%,61% 87%,54% 87%,54% 90%,46% 90%,46% 94%,39% 94%,39% 90%,32% 90%,32% 95%,25% 95%,25% 90%,18% 90%,18% 81%,15% 81%,15% 72%,18% 72%,18% 63%,21% 63%,21% 54%,18% 54%,18% 44%,14% 44%,14% 35%,18% 35%,18% 26%,15% 26%,15% 17%,18% 17%)', compact ? 1.32 : 1)
 
       gsap.set(hotspots, { autoAlpha: 0.28, scale: 0.62 })
       gsap.set(labels, { autoAlpha: 0.2, y: 20 })
@@ -657,6 +709,13 @@ const setupScrollScenes = async () => {
       const maskLockedAt = maskLockStart + maskLockDuration
       const sceneExitAt = 4.82
 
+      /*
+       * How many screens of wheel the whole timeline scrubs over. The section's
+       * height, the brief and the outro are all cut against the same number in
+       * the stylesheet, so a shorter phone runway moves the four together.
+       */
+      const scrubScreens = sceneScreens(commandSceneRef.value, '--command-scrub', 4.2)
+
       const timeline = gsap.timeline({
         defaults: { ease: 'none' },
         // Fires on every playhead render, including the scrub's easing frames, so
@@ -668,7 +727,7 @@ const setupScrollScenes = async () => {
         scrollTrigger: {
           trigger: commandSceneRef.value,
           start: 'top top',
-          end: '+=420%',
+          end: `+=${scrubScreens * 100}%`,
           scrub: 1,
           invalidateOnRefresh: true,
           onUpdate: (self) => {
@@ -755,10 +814,11 @@ const setupScrollScenes = async () => {
      * Two acts against one pinned stage. The crowd starts cropped by the fold and
      * grows until it stands centred; the moment it lands, the four behind it fade
      * off, the lead's body cam lights, and the read-out panels station themselves
-     * either side of him. Below 1024px the section stays static — there is no room
-     * to pin a scene that tall.
+     * either side of him. A phone plays the same two acts against the same pin;
+     * only where the panels come to rest differs, and that is the stylesheet's
+     * business, not this timeline's.
      */
-    mm.add('(min-width: 1024px)', () => {
+    mm.add({ compact: '(max-width: 1023px)', wide: '(min-width: 1024px)' }, () => {
       const harvester = harvesterRef.value
       const figures = harvester?.querySelector('.about-harvester__figures')
       if (!harvester || !figures) return
@@ -779,11 +839,24 @@ const setupScrollScenes = async () => {
        * A resized window re-resolves the svh itself and the scene follows —
        * measuring innerHeight once, as this used to, left the crowd sized for
        * whatever the window had been when the scene was built.
+       * The same two numbers carry the phone. What shows above the fold is the
+       * scale's shortfall plus whatever the figures are lifted off the floor, both
+       * read against the settled height — so as long as the lift stays a small
+       * share of that height, a phone's shorter crowd opens on the same quarter of
+       * itself the wide one does, and neither number has to fork.
        */
       const CROPPED_SCALE = 0.86
       const CROPPED_DROP = 70
 
-      gsap.set(figures, { xPercent: -50, transformOrigin: 'center bottom' })
+      /*
+       * `x: 0` is not redundant. The stylesheet centres this box with its own
+       * translateX(-50%) so a dead script still leaves the crowd on the centre
+       * line, and GSAP reads that back off the computed matrix as a px offset it
+       * then keeps — so xPercent lands a second half-width on top of it and the
+       * group stands a whole width to the left. Zeroing the decoded offset leaves
+       * the percentage as the only thing centring it.
+       */
+      gsap.set(figures, { x: 0, xPercent: -50, transformOrigin: 'center bottom' })
 
       const timeline = gsap.timeline({
         defaults: { ease: 'none' },
@@ -1644,9 +1717,21 @@ onBeforeUnmount(() => {
   line-height: 1.28;
 }
 
+/*
+ * Four numbers cut the whole scene, all of them screens of scroll: how long the
+ * section runs, how much of that the pinned timeline scrubs over, and where the
+ * two blocks of copy that ride past the stage are parked. The script reads the
+ * scrub off this rule, so a breakpoint restates the set once here and the section
+ * height, the timeline and the copy all move together.
+ */
 .about-command {
+  --command-screens: 6.5;
+  --command-scrub: 4.2;
+  --command-brief-at: 2.35;
+  --command-outro-at: 5.25;
+
   position: relative;
-  min-height: 650svh;
+  min-height: calc(var(--command-screens) * 100svh);
   background: #0e1009;
   overflow: clip;
 }
@@ -1687,7 +1772,7 @@ onBeforeUnmount(() => {
 .about-command__outro {
   position: absolute;
   z-index: 6;
-  top: 525svh;
+  top: calc(var(--command-outro-at) * 100svh);
   right: 6.5vw;
   width: min(31rem, 31vw);
   text-shadow: 0 2px 22px rgba(0, 0, 0, 0.42);
@@ -2145,21 +2230,21 @@ onBeforeUnmount(() => {
 }
 
 /* The HUD is a beat of the pinned scene; without the pin there is no frame to
-   station it in, so below the breakpoint the section stays just the crowd. */
-@media (max-width: 1023px), (prefers-reduced-motion: reduce) {
+   station it in, so a reduced-motion pass gets just the crowd. */
+@media (prefers-reduced-motion: reduce) {
   .about-harvester__hud {
     display: none;
   }
 }
 
 /*
- * Desktop plays the section as a scene: the stage pins for the length of the
- * section while the crowd climbs out of the fold and grows to full height, then
- * the four background workers fade off and leave the lead standing alone. The
- * motion itself lives in GSAP — these rules only frame it, so reduced-motion and
- * no-JS still land on the composition described above.
+ * The section plays as a scene: the stage pins for the length of the section
+ * while the crowd climbs out of the fold and grows to full height, then the four
+ * background workers fade off and leave the lead standing alone. The motion
+ * itself lives in GSAP — these rules only frame it, so reduced-motion and no-JS
+ * still land on the composition described above.
  */
-@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+@media (prefers-reduced-motion: no-preference) {
   /*
    * Three screens: one to stand the crowd up, one to hold it, one to collapse to
    * the lead. Every duration in the timeline is a share of this minus the pinned
@@ -2210,6 +2295,88 @@ onBeforeUnmount(() => {
     bottom: 5svh;
     transform: translateX(-50%);
     transform-origin: center bottom;
+  }
+}
+
+/*
+ * The same scene on a narrow screen. Nothing about the beats changes — the crowd
+ * still stands up, hands off to the lead, and the panels still arrive last. What
+ * changes is that the frame is portrait: a group drawn 1.67 times as wide as it
+ * is tall can only be as tall as the width allows, so vw takes the crowd over from
+ * svh, and the panels that stood either side of the lead stack down the free half
+ * of the screen above him instead.
+ */
+@media (max-width: 1023px) and (prefers-reduced-motion: no-preference) {
+  .about-harvester__content {
+    width: calc(100% - 2.3rem);
+    padding: 5.5rem 0 0;
+  }
+
+  /*
+   * Width-bound, so the whole group still reads rather than losing the outer two
+   * off the sides. The lift off the floor stays a small share of that height for
+   * the reason the constants above give: it is what keeps the opening crop at the
+   * same quarter of the figure the wide scene opens on.
+   */
+  .about-harvester__figures {
+    --crowd-height: min(38svh, 58vw);
+
+    bottom: 2svh;
+  }
+
+  /*
+   * Read top to bottom rather than left to right: the caption leads, the unit and
+   * the scan follow on alternating sides, and all three sit clear of the heads.
+   */
+  .about-harvester__hud-panel {
+    padding: 0.8rem 0.85rem 0.9rem;
+  }
+
+  /*
+   * Wide, the label and the read-out share a line with the panel's width between
+   * them. At this width the label alone takes two lines, so the read-out drops to
+   * a line of its own rather than being pushed off the right edge by the `auto`
+   * margin that spaces the two apart.
+   */
+  .about-harvester__hud-tag {
+    flex-wrap: wrap;
+  }
+
+  .about-harvester__hud-tag em {
+    width: 100%;
+    margin-left: 1.15rem;
+    padding-left: 0;
+  }
+
+  .about-harvester__hud-panel--device {
+    left: 1.15rem;
+    top: 24%;
+    width: min(7.5rem, 30vw);
+  }
+
+  .about-harvester__hud-panel--scan {
+    left: auto;
+    right: 1.15rem;
+    top: 35%;
+    width: min(13rem, 46vw);
+  }
+
+  /* Below the bar rather than under it — a squat landscape window puts 7% of its
+     height inside the nav. */
+  .about-harvester__hud-copy {
+    left: 1.15rem;
+    right: 1.15rem;
+    top: 9%;
+    bottom: auto;
+    width: auto;
+  }
+
+  .about-harvester__hud-index {
+    margin-bottom: 0.6rem;
+  }
+
+  .about-harvester__hud-copy p + p {
+    font-size: 0.86rem;
   }
 }
 
@@ -2502,7 +2669,7 @@ onBeforeUnmount(() => {
 .about-command__brief {
   position: absolute;
   z-index: 6;
-  top: 235svh;
+  top: calc(var(--command-brief-at) * 100svh);
   left: 5.1vw;
   width: min(30rem, 42vw);
 }
@@ -2595,8 +2762,11 @@ onBeforeUnmount(() => {
   --spot-edge: rgba(232, 255, 82, 0.1);
   --spot-core: #e8ff52;
   position: absolute;
-  width: var(--spot-size);
-  height: var(--spot-size);
+  /* The discs are cut in rem against a desktop frame; the widest of them is most
+     of a phone's screen, so the narrow branch scales the set rather than three
+     inline sizes. */
+  width: calc(var(--spot-size) * var(--spot-scale, 1));
+  height: calc(var(--spot-size) * var(--spot-scale, 1));
   transform: translate(-50%, -50%);
   mix-blend-mode: screen;
 }
@@ -2672,8 +2842,16 @@ onBeforeUnmount(() => {
   }
 }
 
+/*
+ * The anchor is the dot; the offset is what stands the label clear of it. GSAP
+ * owns `transform` here for the scrubbed hand-off between states, so any framing
+ * this rule needs of its own goes on `translate`, which composes with it instead
+ * of being overwritten on the first tween.
+ */
 .about-command__label {
   position: absolute;
+  left: calc(var(--label-x) + var(--label-dx));
+  top: calc(var(--label-y) + var(--label-dy));
   transform: translateY(-50%);
   padding: 0.45rem 0.75rem;
   font-family: var(--font-mono);
@@ -3313,15 +3491,6 @@ onBeforeUnmount(() => {
     margin-top: 3rem;
   }
 
-  .about-harvester {
-    min-height: auto;
-  }
-
-  .about-harvester__content {
-    width: calc(100% - 2rem);
-    padding: 7.4rem 0 14rem;
-  }
-
   .about-harvester__title {
     margin-left: 0;
     font-size: clamp(3.2rem, 11vw, 5rem);
@@ -3334,6 +3503,88 @@ onBeforeUnmount(() => {
     margin-left: auto;
     font-size: clamp(1rem, 3.7vw, 1.34rem);
     line-height: 1.22;
+  }
+
+  /*
+   * The same scene as the wide one, cut shorter — a thumb covers less ground per
+   * flick than a wheel does, and six screens of pinned stage is a long hold on a
+   * phone. What every beat keeps is its share of the pinned run, which is a screen
+   * shorter than the section: 76% of it scrubbed, the brief crossing at 43% of it
+   * and the outro at 95%. Scaling the section height alone would not hold those,
+   * because the screen the pin costs does not scale with it.
+   */
+  .about-command {
+    --command-screens: 5.2;
+    --command-scrub: 3.2;
+    --command-brief-at: 1.8;
+    --command-outro-at: 4;
+  }
+
+  .about-command__brief {
+    left: 1.15rem;
+    width: min(26rem, calc(100% - 2.3rem));
+  }
+
+  .about-command__outro {
+    left: 1.15rem;
+    right: 1.15rem;
+    width: auto;
+  }
+
+  /* Spread to the frame edges, the mask leaves no margin for a rail beside it. */
+  .about-command__rail {
+    right: 1.15rem;
+    top: 30%;
+    height: 9rem;
+  }
+
+  /* The mesh is cut in vw, so a phone would draw it at four times the density. */
+  .about-command__mesh {
+    background-size: 14vw 14vw, 14vw 14vw, auto;
+  }
+
+  .about-command__visual {
+    --spot-scale: 0.46;
+  }
+
+  /*
+   * No room to the right of a dot for a nameplate, so it sits under one instead.
+   * `translate` rather than `transform`: GSAP owns the latter for the hand-off.
+   */
+  .about-command__label {
+    left: var(--label-x);
+    top: calc(var(--label-y) + 7%);
+    translate: -50% 0;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+  }
+
+  .about-briefs {
+    padding: 4rem 1.15rem;
+  }
+
+  .about-command__boot-readout {
+    right: 6%;
+    gap: 0.25rem 1.1rem;
+    font-size: 0.56rem;
+  }
+}
+
+/*
+ * Without the scrub there is no runway for an svh offset to ride, so the two
+ * blocks of copy fall under the stage and the harvester section stands as a
+ * plain stacked one. Both stay positioned rather than going static: the stage
+ * above them is sticky, and a static box cannot carry a z-index to paint over one.
+ */
+@media (max-width: 1023px) and (prefers-reduced-motion: reduce) {
+  .about-harvester {
+    min-height: auto;
+  }
+
+  .about-harvester__content {
+    width: calc(100% - 2rem);
+    padding: 7.4rem 0 14rem;
   }
 
   .about-harvester__figures {
@@ -3351,12 +3602,6 @@ onBeforeUnmount(() => {
     display: none;
   }
 
-  /*
-   * No pin below this width, so there is no scroll for an svh offset to ride and
-   * the copy just falls under the stage. It stays positioned rather than going
-   * static: the stage above it is sticky, and a static box cannot carry a z-index
-   * to paint over one.
-   */
   .about-command__brief {
     position: relative;
     top: auto;
@@ -3364,9 +3609,8 @@ onBeforeUnmount(() => {
     width: auto;
     padding: 3.5rem 1.15rem 4.5rem;
     /*
-     * Desktop reads this copy off a map the scrub has already drained to grey; the
-     * scrub never runs down here, so the photo stays light and the type needs a
-     * ground of its own to sit on.
+     * The scrub is what drains the map to grey under this copy; with no scrub the
+     * photo stays light and the type needs a ground of its own to sit on.
      */
     background: linear-gradient(
       to bottom,
@@ -3374,23 +3618,6 @@ onBeforeUnmount(() => {
       rgba(14, 16, 9, 0.88) 14%,
       rgba(14, 16, 9, 0.94) 100%
     );
-  }
-
-  .about-briefs {
-    padding: 4rem 1.15rem;
-  }
-
-  .about-command__boot-readout {
-    right: 6%;
-    gap: 0.25rem 1.1rem;
-    font-size: 0.56rem;
-  }
-
-  .about-command__field {
-    position: absolute;
-    inset: 0;
-    min-height: 0;
-    margin: 0;
   }
 }
 
@@ -3464,12 +3691,18 @@ onBeforeUnmount(() => {
     padding-inline: 1rem 1.35rem;
   }
 
-  .about-harvester__content {
-    padding-bottom: 11.5rem;
-  }
-
   .about-harvester__summary {
     width: min(18rem, 82vw);
+  }
+
+  .about-hero__aside {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) and (prefers-reduced-motion: reduce) {
+  .about-harvester__content {
+    padding-bottom: 11.5rem;
   }
 
   .about-harvester__figures {
@@ -3477,10 +3710,6 @@ onBeforeUnmount(() => {
     width: min(24rem, 112vw);
     height: auto;
     transform: translateX(-50%);
-  }
-
-  .about-hero__aside {
-    display: none;
   }
 }
 </style>
