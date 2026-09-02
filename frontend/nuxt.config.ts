@@ -46,6 +46,13 @@ export default defineNuxtConfig({
     url: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3010',
   },
 
+  // The module finds the static pages itself; `/news/[slug]` is parameterised,
+  // so the published article URLs have to be handed to it. See
+  // `server/api/__sitemap__/urls.js`.
+  sitemap: {
+    sources: ['/api/__sitemap__/urls'],
+  },
+
   // Static hosting has no server to run IPX's on-demand image resizing, so
   // skip it entirely and let NuxtImg render plain <img> tags with the
   // original src (also sidesteps IPX's build-time prerendering, which
