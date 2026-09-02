@@ -2,12 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Mail\NewContactEnquiryMail;
 use App\Models\JobOpening;
 use App\Models\NewsletterSubscriber;
 use App\Models\Setting;
 use App\Models\SolutionCategory;
 use App\Models\SolutionItem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class PublicApiTest extends TestCase
@@ -66,6 +68,27 @@ class PublicApiTest extends TestCase
 
         $response->assertCreated();
         $this->assertDatabaseHas('contact_enquiries', ['email' => 'test@example.com']);
+    }
+
+    public function test_contact_enquiry_notification_is_queued_not_sent_inline(): void
+    {
+        // The notification used to be sent inside the request, which made the
+        // visitor wait on the mail host (~3.4s of a 3.8s response in production).
+        // assertNotSent is the half that matters: it fails if someone drops the
+        // ShouldQueue contract and quietly puts the round trip back in the request.
+        Mail::fake();
+
+        $this->postJson('/api/v1/contact-enquiries', [
+            'enquiry_type' => 'Drilling Consumables',
+            'region' => 'Asia',
+            'country' => 'Philippines',
+            'name' => 'Test User',
+            'email' => 'queued@example.com',
+            'message' => 'Hello, I have a question.',
+        ])->assertCreated();
+
+        Mail::assertQueued(NewContactEnquiryMail::class);
+        Mail::assertNotSent(NewContactEnquiryMail::class);
     }
 
     public function test_contact_enquiry_honeypot_field_rejects_bots(): void

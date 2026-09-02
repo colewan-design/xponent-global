@@ -123,8 +123,12 @@ return [
     | New contact enquiries and job applications are emailed here. Defaults
     | to the log driver in local dev, so nothing external is required to run.
     |
+    | The fallback must be a mailbox that actually exists: admin@ was the
+    | previous default and does not exist on the mail host (Exim answers
+    | "550 No Such User Here"), so every notification it addressed bounced.
+    |
     */
 
-    'admin_address' => env('ADMIN_NOTIFICATION_EMAIL', 'admin@xponent-global.com'),
+    'admin_address' => env('ADMIN_NOTIFICATION_EMAIL', 'support@xponent-global.com'),
 
 ];
