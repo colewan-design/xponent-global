@@ -75,7 +75,10 @@ Route::get('/settings', [SettingController::class, 'index']);
 |--------------------------------------------------------------------------
 */
 
-Route::post('/auth/login', [AuthController::class, 'login']);
+// Throttled hard: this is the only public door into the admin, and a failed
+// attempt is cheap for an attacker but expensive for us. 5/min per IP is well
+// above what a person typing a password needs and well below useful guessing.
+Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/auth/me', [AuthController::class, 'me']);

@@ -76,4 +76,46 @@ class AuthTest extends TestCase
 
         $response->assertStatus(401);
     }
+
+    public function test_repeated_failed_logins_are_rate_limited(): void
+    {
+        // The login route is the only public door into the admin. Laravel 11+
+        // ships no default throttle on the `api` group, so without an explicit
+        // one this endpoint accepted unlimited guesses — verified in production
+        // before the fix: 12 rapid attempts, 12 responses, zero 429s.
+        User::factory()->create(['email' => 'admin@example.com']);
+
+        $attempt = fn () => $this->fromAdminOrigin()->postJson('/api/v1/auth/login', [
+            'email' => 'admin@example.com',
+            'password' => 'wrong-password',
+        ]);
+
+        // throttle:5,1 — the first five are processed as ordinary failures.
+        for ($i = 0; $i < 5; $i++) {
+            $attempt()->assertStatus(422);
+        }
+
+        $attempt()->assertStatus(429);
+    }
+
+    public function test_rate_limiter_does_not_block_a_legitimate_login(): void
+    {
+        // Guards against setting the limit so low that a person who fats-fingers
+        // their password a couple of times is locked out of their own admin.
+        $user = User::factory()->admin()->create(['email' => 'admin@example.com']);
+
+        for ($i = 0; $i < 2; $i++) {
+            $this->fromAdminOrigin()->postJson('/api/v1/auth/login', [
+                'email' => 'admin@example.com',
+                'password' => 'wrong-password',
+            ])->assertStatus(422);
+        }
+
+        $this->fromAdminOrigin()->postJson('/api/v1/auth/login', [
+            'email' => 'admin@example.com',
+            'password' => 'password',
+        ])->assertOk();
+
+        $this->assertAuthenticatedAs($user);
+    }
 }
