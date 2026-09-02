@@ -1,0 +1,10 @@
+# core.autocrlf is on for this checkout, which would hand CRLF line endings to
+# files that are copied straight onto the Linux server. A shell script with CRLF
+# fails there in a way that reads as nonsense ("cannot execute: required file not
+# found", or a syntax error on a line that looks fine), so pin the ones that
+# travel to LF regardless of platform.
+
+*.sh        text eol=lf
+.nvmrc      text eol=lf
+*.service   text eol=lf
+*.timer     text eol=lf

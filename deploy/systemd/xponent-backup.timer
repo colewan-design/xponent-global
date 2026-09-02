@@ -1,0 +1,14 @@
+[Unit]
+Description=Run the Xponent Global backup nightly
+
+[Timer]
+# 02:20 UTC — after the nightly certbot/apt windows, well clear of business
+# hours in Asia/Manila (UTC+8), where the site's traffic actually is.
+OnCalendar=*-*-* 02:20:00
+RandomizedDelaySec=300
+
+# If the box was off at 02:20, run once it is back rather than skipping the day.
+Persistent=true
+
+[Install]
+WantedBy=timers.target

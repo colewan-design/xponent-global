@@ -1,0 +1,15 @@
+[Unit]
+Description=Xponent Global nightly backup (database + uploads)
+After=mariadb.service
+Wants=mariadb.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/xponent-backup.sh
+User=root
+Nice=10
+IOSchedulingClass=idle
+
+# The dump is small, but the uploads archive is not; keep it off the CPU and
+# disk that the live site is using.
+CPUSchedulingPolicy=batch
