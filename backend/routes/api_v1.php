@@ -30,7 +30,9 @@ use App\Http\Controllers\Api\OfficeLocationController;
 use App\Http\Controllers\Api\PageContentController;
 use App\Http\Controllers\Api\PartnerController;
 use App\Http\Controllers\Api\PostController;
+use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ResourceController;
+use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\SettingController;
 use App\Http\Controllers\Api\SolutionCategoryController;
 use Illuminate\Support\Facades\Route;
@@ -64,6 +66,14 @@ Route::get('/office-locations', [OfficeLocationController::class, 'index']);
 
 Route::get('/solutions', [SolutionCategoryController::class, 'index']);
 Route::get('/solutions/{solutionCategory:slug}', [SolutionCategoryController::class, 'show']);
+
+// The catalogue as the site shows it: active SKUs, specifications, no prices.
+// Admin\ProductController is the priced, stocked view of the same table.
+Route::get('/products', [ProductController::class, 'index']);
+
+// Throttled harder than the rest because the live results panel in the header
+// calls it per keystroke, and every call is a LIKE scan of five tables.
+Route::get('/search', SearchController::class)->middleware('throttle:60,1');
 
 Route::get('/page-content/{page}', [PageContentController::class, 'show']);
 

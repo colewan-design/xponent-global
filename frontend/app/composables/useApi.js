@@ -22,6 +22,20 @@ export function apiBaseUrl() {
 export function useApiFetch(path, options = {}) {
   const { key, ...rest } = options
   const route = useRoute()
+
+  return useFetch(path, {
+    baseURL: apiBaseUrl(),
+    // Derived lazily, because a caller that passes reactive params — /search
+    // re-runs its request as the term changes — hands us refs, and refs cannot
+    // be JSON.stringify'd: a computed's dep graph is circular and throws. Such
+    // a caller passes its own `key`, so with the fallback evaluated only when
+    // it is actually needed, the two never meet.
+    key: key ?? autoKey(route, path, options),
+    ...rest,
+  })
+}
+
+function autoKey(route, path, options) {
   const routeKey = route?.path ?? 'global'
   const requestKey = JSON.stringify({
     path,
@@ -29,11 +43,7 @@ export function useApiFetch(path, options = {}) {
     query: options.query ?? {},
   })
 
-  return useFetch(path, {
-    baseURL: apiBaseUrl(),
-    key: key ?? `api:${routeKey}:${requestKey}`,
-    ...rest,
-  })
+  return `api:${routeKey}:${requestKey}`
 }
 
 export function apiPost(path, body) {

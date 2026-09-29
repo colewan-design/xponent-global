@@ -64,6 +64,31 @@ function emptyForm() {
 
 const form = reactive(emptyForm())
 
+/**
+ * Prefills the message from `?enquiry=`.
+ *
+ * The product catalogue and the industries page link here with the line or
+ * sector already named, so the visitor is not asked to retype a part number
+ * they just clicked. It writes to `message` rather than to `enquiry_type`
+ * because that select is a fixed list that predates the SKU catalogue and has
+ * no option matching most of it.
+ *
+ * Only ever prefills an untouched field, so arriving via back-navigation after
+ * typing cannot overwrite what was written.
+ */
+const route = useRoute()
+
+watch(
+  () => route.query.enquiry,
+  (enquiry) => {
+    const prefill = String(enquiry ?? '').trim().slice(0, 300)
+    // Two trailing newlines so the cursor lands under the prefilled line rather
+    // than at the end of it.
+    if (prefill && !form.message) form.message = prefill + '\n\n'
+  },
+  { immediate: true },
+)
+
 const submitting = ref(false)
 const status = ref('')
 const errorMessage = ref('')

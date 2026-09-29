@@ -3,7 +3,17 @@
  * About page rebuilt around a pinned scrollytelling command scene.
  * Anchor ids remain stable because the header links directly to them.
  */
-const { data: about } = await useApiFetch('/page-content/about')
+
+/*
+ * The global site header is suppressed here. This page flies its own fixed,
+ * tone-aware nav across the top of the command scene, and the two bars stacked
+ * over one another left the page's logo reading through the header's. The flag
+ * is consumed by layouts/default.vue.
+ */
+definePageMeta({ hideSiteHeader: true })
+// Awaited, unlike on the landing page: the opening scene is built from this copy
+// and has nothing to show without it.
+const { data: about } = await useAboutContent()
 const { data: locations } = await useApiFetch('/office-locations', { key: 'office-locations' })
 const { data: affiliations } = await useApiFetch('/partners', { params: { type: 'affiliation' } })
 const aboutCommandBackdropImage = '/images/about-inversa.webp'
@@ -59,89 +69,14 @@ const affiliationCardRefs = ref([])
 
 let destroyScroll = () => {}
 
-const sections = computed(() => about.value?.data?.sections ?? [])
-const legacyAboutSectionCopy = {
-  intro: {
-    heading: 'About XGL â€” Who we are',
-    body: "Xponent Global Limited\n\nXponent Global is an international total solutions provider in the mining, drilling, oil and gas, construction and energy sector. With combined professional experience of over 30 years, Xponent Global's broad scope of expertise includes effectively turning ideas into opportunities and opportunities into action, helping nations thrive and work towards a better world.",
-  },
-  vision: {
-    heading: 'Our Vision',
-    body: 'To drive innovation, excellence, and reliability, ensuring we remain the preferred choice for companies worldwide.',
-  },
-  mission: {
-    heading: 'Our Mission',
-    body: 'To provide the best possible product, service, technology and pricing on merchandise with the expertise to bring the deal together smoothly and quickly. We believe that to be able to run a great drilling & mining operation, a dependable and reliable supplier should be part of the team.',
-  },
-  coreValues: {
-    heading: 'Our Core Values',
-    body: "Quality: We prioritize client satisfaction by optimizing resources and ensuring rigorous quality control, maintaining accuracy from loading to shipment.\n\nCommitment: Upholding combined 30+ years of excellence, we seamlessly extend client operations with timely, organized delivery exceeding expectations.\n\nValue: We take pride in delivering the best deals, earning trust as the preferred global supplier in construction, mining, and exploration.",
-  },
-  whereWeOperate: {
-    heading: 'Where We Operate',
-    body: null,
-  },
-  affiliations: {
-    heading: 'Our Affiliations',
-    body: "We proudly support these organizations based on our mutual interests within the mining, construction and geotechnical industry.\n\nWe aim to develop and maintain a strong relationship with them to support their causes, extend our own knowledge, expertise and network of specialists.",
-  },
-}
-
-const aboutSectionCopy = {
-  intro: {
-    heading: 'About XGL - Who we are',
-    body: "Xponent Global Limited\n\nXponent Global is an international total solutions provider supporting mining, drilling, oil and gas, construction, energy, and industrial operations. With more than 30 years of combined experience, we connect specialist products, commercial insight, and dependable execution to help clients move from planning to delivery with confidence.",
-  },
-  vision: {
-    heading: 'Our Vision',
-    body: 'To be the preferred global solutions partner for industries that depend on safe, efficient, and reliable field operations.',
-  },
-  mission: {
-    heading: 'Our Mission',
-    body: "To deliver the right products, technical support, and commercial solutions at the right time and value.\n\nWe work as an extension of our clients' teams, helping keep drilling, mining, construction, and energy operations supplied, responsive, and ready to perform.",
-  },
-  coreValues: {
-    heading: 'Our Core Values',
-    body: "Quality: We maintain high standards across sourcing, coordination, and delivery so every order arrives accurate, compliant, and ready for use.\n\nCommitment: We respond with urgency, communicate clearly, and stay accountable from first enquiry to final delivery.\n\nValue: We combine technical understanding, trusted supply partnerships, and commercial discipline to deliver practical value in every project.",
-  },
-  whereWeOperate: {
-    heading: 'Where We Operate',
-    body: 'Our network spans key operating markets, with teams and partners positioned to support mobilisation, procurement, and delivery close to the projects we serve.',
-  },
-  affiliations: {
-    heading: 'Our Affiliations',
-    body: "Our industry affiliations keep us connected to the sectors we serve and strengthen the relationships, knowledge, and standards behind our work.\n\nThrough these networks, we stay engaged with industry developments, contribute to shared priorities, and expand the specialist support available to our clients.",
-  },
-}
-
-const normalizeAboutSection = (section, legacy, replacement) => {
-  if (!section) return { ...replacement, image: replacement.image ?? null }
-
-  const heading = section.heading ?? null
-  const body = section.body ?? null
-  const hasMeaningfulCopy = Boolean((heading ?? '').trim() || (body ?? '').trim())
-  const matchesLegacy = heading === legacy.heading && body === legacy.body
-  const needsReplacement = !hasMeaningfulCopy || matchesLegacy || body === legacy.body
-
-  return {
-    ...section,
-    ...(needsReplacement ? replacement : {}),
-    image: section.image ?? replacement.image ?? null,
-  }
-}
-
-const intro = computed(() => normalizeAboutSection(sections.value[0], legacyAboutSectionCopy.intro, aboutSectionCopy.intro))
-const vision = computed(() => normalizeAboutSection(sections.value[1], legacyAboutSectionCopy.vision, aboutSectionCopy.vision))
-const mission = computed(() => normalizeAboutSection(sections.value[2], legacyAboutSectionCopy.mission, aboutSectionCopy.mission))
-const coreValues = computed(() => normalizeAboutSection(sections.value[3], legacyAboutSectionCopy.coreValues, aboutSectionCopy.coreValues))
-const whereWeOperate = computed(() => normalizeAboutSection(sections.value[4], legacyAboutSectionCopy.whereWeOperate, aboutSectionCopy.whereWeOperate))
-const affiliationsIntro = computed(() => normalizeAboutSection(sections.value[5], legacyAboutSectionCopy.affiliations, aboutSectionCopy.affiliations))
-
-const splitParagraphs = (text) =>
-  (text ?? '')
-    .split('\n\n')
-    .map((paragraph) => paragraph.trim())
-    .filter(Boolean)
+/*
+ * The ordered sections, named, with their fallback copy already applied. The
+ * tables and the normaliser moved to `useAboutSections` when the landing page's
+ * credibility band started showing the same mission and vision — see that file
+ * for why the fallbacks exist at all.
+ */
+const { intro, vision, mission, coreValues, whereWeOperate, affiliationsIntro } =
+  useAboutSections(about)
 
 const plottedLocations = computed(() =>
   (locations.value?.data ?? []).filter((location) => {

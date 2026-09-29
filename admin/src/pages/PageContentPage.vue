@@ -10,9 +10,14 @@ import { useToastStore } from '../stores/toast'
 
 const toast = useToastStore()
 
+// Hardcoded rather than read from the API's response: this list decides which
+// pages are *offered* for editing, and the labels are the site's words for them.
+// A page missing from here is uneditable even though its content row exists — so
+// a new editorial page on the site needs a line added here too.
 const pages = [
   { value: 'home', label: 'Home' },
   { value: 'about', label: 'About Us' },
+  { value: 'industries', label: 'Industries' },
   { value: 'sustainability', label: 'Sustainability' },
   { value: 'careers', label: 'Careers' },
   { value: 'resources', label: 'Resources' },

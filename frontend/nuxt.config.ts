@@ -51,6 +51,12 @@ export default defineNuxtConfig({
   // `server/api/__sitemap__/urls.js`.
   sitemap: {
     sources: ['/api/__sitemap__/urls'],
+
+    // /search renders `robots: noindex` — a results page is thin and infinitely
+    // variable. Submitting a noindex URL in the sitemap is the contradiction
+    // Search Console reports as "Submitted URL marked 'noindex'", so it is
+    // excluded here rather than left to be discovered and rejected.
+    exclude: ['/search'],
   },
 
   // Static hosting has no server to run IPX's on-demand image resizing, so
