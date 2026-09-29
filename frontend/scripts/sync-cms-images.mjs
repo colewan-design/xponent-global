@@ -15,8 +15,10 @@
  *    it can happen without a runtime image service.
  *
  * Incremental: a destination file whose mtime matches its source is left alone,
- * so repeat builds do no work. Destinations with no surviving source are pruned,
- * so deleting artwork in the admin eventually clears it from the bundle too.
+ * so repeat builds do no work. Destinations with no surviving source are kept
+ * and reported; set CMS_IMAGE_PRUNE=1 from a fully seeded checkout to clear
+ * artwork deleted in the admin out of the bundle. See the prune block below for
+ * why that direction is opt-in.
  */
 import { Buffer } from 'node:buffer'
 import { existsSync } from 'node:fs'
@@ -56,8 +58,22 @@ function formatBytes(bytes) {
  * only adds generation loss and weight.
  */
 async function optimise(sourceBytes, extension) {
-  const image = sharp(sourceBytes, { failOn: 'none' })
-  const { width, height } = await image.metadata()
+  // `.rotate()` with no angle applies the EXIF orientation and drops the flag.
+  //
+  // Without it, a phone photo carrying `Orientation=6` is re-encoded from its raw
+  // pixel buffer and the flag is stripped on the way out — so a picture the
+  // browser used to turn upright ships permanently on its side. Seven of the
+  // bundled images were rotated this way, two of them case-study covers.
+  const image = sharp(sourceBytes, { failOn: 'none' }).rotate()
+
+  // `metadata()` describes the *stored* buffer and is unaffected by anything
+  // queued on the pipeline, so the stored dimensions have to be swapped by hand
+  // for the orientations that turn the image a quarter turn (5–8). Testing the
+  // unswapped axis would resize a portrait photo against its long edge.
+  const meta = await sharp(sourceBytes, { failOn: 'none' }).metadata()
+  const quarterTurned = meta.orientation >= 5 && meta.orientation <= 8
+  const width = quarterTurned ? meta.height : meta.width
+  const height = quarterTurned ? meta.width : meta.height
 
   const oversized = (width ?? 0) > MAX_EDGE || (height ?? 0) > MAX_EDGE
   if (oversized) {
@@ -161,13 +177,32 @@ async function main() {
 
   // Prune anything the backend no longer has, so deleted artwork does not live
   // on in the deployed bundle.
+  //
+  // Opt-in, because the source disk is only authoritative on a machine that has
+  // been fully seeded. Laravel's .gitignore excludes backend/storage/app/public/,
+  // so an ordinary checkout holds whatever subset that developer happened to
+  // seed — and pruning against a partial source deletes the tracked copies under
+  // public/cms/, which are the only ones in the repo.
+  //
+  // That is not hypothetical: a build from a checkout with 6 of the 69 images
+  // pruned 54 of the site's 58 references, and every one of them 404'd in
+  // production until they were restored from git. The empty-source guard above
+  // is the same reasoning — a partial source is no more trustworthy than an
+  // empty one, it just fails less visibly.
   const keep = new Set(images)
   let pruned = 0
-  for (const name of await readdir(DEST_DIR)) {
-    if (!keep.has(name)) {
+  const orphans = (await readdir(DEST_DIR)).filter((name) => !keep.has(name))
+
+  if (orphans.length > 0 && process.env.CMS_IMAGE_PRUNE === '1') {
+    for (const name of orphans) {
       await unlink(path.join(DEST_DIR, name))
       pruned += 1
     }
+  } else if (orphans.length > 0) {
+    console.warn(
+      `[cms-images] keeping ${orphans.length} bundled image(s) with no source at ${SOURCE_DIR}. ` +
+        `Run with CMS_IMAGE_PRUNE=1 from a fully seeded checkout to remove them.`,
+    )
   }
 
   console.log(

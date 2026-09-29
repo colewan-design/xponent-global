@@ -9,6 +9,7 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "sync:images": "node scripts/sync-cms-images.mjs",
+    "optimise:static": "node scripts/optimise-static-images.mjs",
     "predev": "node scripts/sync-cms-images.mjs",
     "prebuild": "node scripts/sync-cms-images.mjs",
     "pregenerate": "node scripts/sync-cms-images.mjs"

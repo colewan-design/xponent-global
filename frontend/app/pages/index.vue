@@ -8,10 +8,17 @@ definePageMeta({ keepalive: true })
 /**
  * Landing page — supply-catalogue layout.
  *
- * Structure follows the Uniglobal storefront's retail homepage: a statement
- * masthead, merchandising tiles, a grey provenance field, the service band, a
- * browsable directory of what we supply, proof, editorial, and long-tail copy at
- * the foot. Sections live alongside in components/Home*.vue.
+ * Ordered as a buyer reads it: what we supply, why us, what that looks like in
+ * the box, who already buys it, proof it works, then the ask. Long-tail copy
+ * closes the page, below the ask, so the last thing on screen is an action
+ * rather than a paragraph.
+ *
+ *   hero -> categories -> credibility -> featured stock -> clients ->
+ *   case studies -> CTA -> SEO copy
+ *
+ * Surfaces alternate dark / white / smoke down the page so each band reads as a
+ * separate section without needing a rule between them. Sections live alongside
+ * in components/Home*.vue.
  */
 // `lazy` on every request, deliberately. Without it Nuxt suspends the whole
 // route until all six settle, so one slow endpoint holds back the five sections
@@ -33,6 +40,10 @@ const { data: news, status: newsStatus } = useApiFetch('/posts', {
   params: { type: 'news' },
   lazy: true,
 })
+// The mission and vision statements shown in the credibility band live on the
+// About page's record, not this one. Keyed and shared with `/about`, so moving
+// between the two pages does not re-request it.
+const { data: about, status: aboutStatus } = useAboutContent({ lazy: true })
 
 // 'idle' counts as loading: a lazy request that has not started yet has no data
 // either, and showing the empty state before the first byte is the flicker these
@@ -43,6 +54,9 @@ const homePending = computed(() => isLoading(homeStatus))
 const solutionsPending = computed(() => isLoading(solutionsStatus))
 const clientsPending = computed(() => isLoading(clientsStatus))
 const guidesPending = computed(() => isLoading(caseStudiesStatus) || isLoading(newsStatus))
+const aboutPending = computed(() => isLoading(aboutStatus))
+
+const { mission, vision } = useAboutSections(about)
 
 useSeoMeta({
   title: 'Supplying Confidence. Delivering Certainty.',
@@ -65,15 +79,24 @@ const clientList = computed(() => clients.value?.data ?? [])
   <div>
     <HomeHero />
     <HomeTiles :categories="solutionCategories" :pending="solutionsPending" />
-    <HomeAbout :section="introSection" :pending="homePending" />
-    <HomeBenefits :office-count="locations?.data?.length ?? 0" :range-count="solutionCategories.length" />
-    <HomeDirectory :categories="solutionCategories" :pending="solutionsPending" />
+    <HomeCredibility
+      :section="introSection"
+      :pending="homePending"
+      :office-count="locations?.data?.length ?? 0"
+      :range-count="solutionCategories.length"
+      :client-count="clientList.length"
+      :mission="mission"
+      :vision="vision"
+      :briefs-pending="aboutPending"
+    />
+    <HomeFeatured :categories="solutionCategories" :pending="solutionsPending" />
     <HomeClients :clients="clientList" :pending="clientsPending" />
     <HomeGuides
       :case-studies="caseStudies?.data ?? []"
       :news="news?.data ?? []"
       :pending="guidesPending"
     />
+    <HomeCta />
     <HomeSeoBlock :section="introSection" :pending="homePending" />
   </div>
 </template>

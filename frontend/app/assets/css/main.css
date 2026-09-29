@@ -63,11 +63,12 @@ html.lenis {
   overflow: clip;
 }
 
-/* The header pins as one unit — three stacked bars, ~10rem tall — so anchor
-   targets need to clear all of it. */
+/* The header pins as one unit — now two stacked bars, ~6rem tall — so anchor
+   targets need to clear all of it. Was 11rem for the previous three-bar
+   header; leaving it there would have dropped every anchor 5rem short. */
 section[id],
 div[id] {
-  scroll-margin-top: 11rem;
+  scroll-margin-top: 7rem;
 }
 
 /* Tailwind emits utilities inside cascade layers; unlayered CSS always wins over
@@ -97,7 +98,7 @@ div[id] {
 
 /* The page measure. `-wide` is for the pinned header and full-width bands. */
 .container-retail {
-  max-width: 1440px;
+  max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
   padding-left: 1rem;
@@ -105,7 +106,7 @@ div[id] {
 }
 
 .container-retail-wide {
-  max-width: 1840px;
+  max-width: 1240px;
   margin-left: auto;
   margin-right: auto;
   padding-left: 1rem;
@@ -136,13 +137,120 @@ div[id] {
   }
 }
 
+/* --- Section rhythm ------------------------------------------------------ */
+
+/*
+ * One vertical scale for every landing-page band, so the page breathes at a
+ * consistent rate instead of each section picking its own padding. The previous
+ * mix of `py-8 sm:py-10` and `pb-10 sm:pb-12` left major sections ~40px apart,
+ * which read as one continuous wall of content rather than distinct sections.
+ *
+ * `.section-tight` is for a band that follows one it belongs with (a CTA closing
+ * a section, say) and should not restate the full gap.
+ */
+.section {
+  padding-top: 3.5rem;
+  padding-bottom: 3.5rem;
+}
+
+.section-tight {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+@media (min-width: 640px) {
+  .section {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+
+  .section-tight {
+    padding-top: 3.25rem;
+    padding-bottom: 3.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .section {
+    padding-top: 3.5rem;
+    padding-bottom: 3.5rem;
+  }
+
+  .section-tight {
+    padding-top: 3.75rem;
+    padding-bottom: 3.75rem;
+  }
+}
+
+/* --- Actions -------------------------------------------------------------- */
+
+/*
+ * Two actions carry the whole site: "Browse Solutions" and "Contact Xponent".
+ * Everything else is a link, not a button.
+ *
+ * Gold is the action colour and is spent only here — the page previously used
+ * `text-gold-dark` for every inline link as well, which left nothing to mark the
+ * one thing a visitor is meant to do next.
+ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.82rem 1.65rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.btn-primary {
+  background-color: var(--color-gold);
+  color: var(--color-steel-950);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-gold-light);
+}
+
+/* On white. A gold fill on white at this size is loud enough to compete with the
+   primary, so the secondary is an outline that fills with ink on hover. */
+.btn-secondary {
+  border: 1px solid rgba(17, 17, 17, 0.25);
+  color: var(--color-ink);
+}
+
+.btn-secondary:hover {
+  border-color: var(--color-ink);
+  background-color: var(--color-ink);
+  color: #ffffff;
+}
+
+/* On the dark bands, where the outline needs to be light instead. */
+.btn-secondary-dark {
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+}
+
+.btn-secondary-dark:hover {
+  border-color: #ffffff;
+  background-color: #ffffff;
+  color: var(--color-steel-950);
+}
+
 /* --- Long-form copy ------------------------------------------------------ */
 
 /* Long-tail copy collapsed behind a "See More" toggle — the fade tells the
    reader there is more text without needing a hard cut. The text stays in the
    DOM either way, so crawlers and screen readers get all of it. */
 .retail-clamp {
-  max-height: 7.5rem;
+  /* Set against the two-column measure this now wraps: at 7.5rem a balanced
+     two-column block showed barely two lines per column before the fade. */
+  max-height: 10rem;
   overflow: hidden;
   -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
   mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
