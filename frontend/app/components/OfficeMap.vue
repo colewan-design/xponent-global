@@ -2,9 +2,9 @@
 /**
  * The offices on a real map, replacing the flat picture the panel used to show.
  *
- * Leaflet with CARTO's Positron basemap: keyless, and its near-monochrome
- * palette is the closest tile set to the black-and-white artwork it succeeds,
- * so the panel reads the same as before at a glance.
+ * Leaflet with Esri's Light Gray Canvas basemap: keyless, and its
+ * near-monochrome palette is the closest tile set to the black-and-white
+ * artwork it succeeds, so the panel reads the same as before at a glance.
  *
  * Leaflet touches `window` at import time, so it is imported dynamically inside
  * `onMounted` and the whole component is rendered under `<ClientOnly>` by its
@@ -65,12 +65,30 @@ onMounted(async () => {
     attributionControl: true,
   })
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    attribution:
-      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    subdomains: 'abcd',
-    maxZoom: 19,
-  }).addTo(map)
+  /*
+   * CARTO's Positron basemap used to sit here and was keyless when this was
+   * written. CARTO has since put its basemaps behind an API key, and it does not
+   * fail loudly: every tile still answers 200, with a 2KB "API KEY REQUIRED"
+   * watermark image, so the map rendered as a grid of watermarks rather than
+   * erroring. If this panel ever looks wrong again, check what a single tile
+   * actually returns before assuming the code broke.
+   *
+   * Esri's Light Gray Canvas is the closest keyless substitute for Positron's
+   * palette. Note the {z}/{y}/{x} order — Esri's REST tiles are not {z}/{x}/{y}.
+   * Should this one go the same way, the durable answer is a free API key from
+   * CARTO, Stadia or MapTiler, not a fourth keyless provider.
+   *
+   * maxZoom is the service's real ceiling: past 16 it returns a placeholder
+   * tile, so allowing more would let the visitor zoom into blank grey.
+   */
+  L.tileLayer(
+    'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+    {
+      attribution:
+        'Tiles &copy; <a href="https://www.esri.com/">Esri</a> &mdash; Esri, HERE, Garmin, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 16,
+    },
+  ).addTo(map)
 
   const icon = pinIcon(L)
   for (const location of plottable.value) {
